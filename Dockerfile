@@ -22,7 +22,7 @@ ENV FLASK_APP=run.py
 ENV PYTHONUNBUFFERED=1
 
 # Expose port
-EXPOSE 5000
+EXPOSE 5050
 
 # Run with gunicorn for production
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "--threads", "4", "run:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5050", "--workers", "2", "--threads", "4", "run:app"]

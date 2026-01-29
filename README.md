@@ -26,7 +26,7 @@ cd may
 docker compose up -d
 ```
 
-Access the application at `http://localhost:5000`
+Access the application at `http://localhost:5050`
 
 **Default login:**
 - Username: `admin`

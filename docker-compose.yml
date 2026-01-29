@@ -4,7 +4,7 @@ services:
     container_name: may
     restart: unless-stopped
     ports:
-      - "5000:5000"
+      - "5050:5050"
     volumes:
       - may_data:/app/data
     environment:
