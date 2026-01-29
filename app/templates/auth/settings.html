@@ -27,6 +27,14 @@
                     </a>
                 </li>
                 <li>
+                    <a href="#menu" class="settings-nav-item flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md whitespace-nowrap" onclick="showSection('menu')">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                        {{ _('Menu & Navigation') }}
+                    </a>
+                </li>
+                <li>
                     <a href="#integrations" class="settings-nav-item flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md whitespace-nowrap" onclick="showSection('integrations')">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
@@ -40,6 +48,14 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
                         </svg>
                         {{ _('API') }}
+                    </a>
+                </li>
+                <li>
+                    <a href="#services" class="settings-nav-item flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md whitespace-nowrap" onclick="showSection('services')">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/>
+                        </svg>
+                        {{ _('Integrations') }}
                     </a>
                 </li>
                 <li>
@@ -174,6 +190,51 @@
                             </div>
                         </div>
 
+                        <!-- Appearance -->
+                        <div class="bg-white dark:bg-gray-800 shadow rounded-lg divide-y divide-gray-200 dark:divide-gray-700">
+                            <div class="p-6">
+                                <h2 class="text-lg font-medium text-gray-900 dark:text-white">{{ _('Appearance') }}</h2>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ _('Customize how the app looks') }}</p>
+                            </div>
+
+                            <div class="p-6">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="text-sm font-medium text-gray-900 dark:text-white">{{ _('Dark Mode') }}</h3>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ _('Use dark theme for the interface') }}</p>
+                                    </div>
+                                    <button type="button" onclick="toggleDarkMode()"
+                                            class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 bg-gray-200 dark:bg-primary-600"
+                                            role="switch">
+                                        <span class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-0 dark:translate-x-5"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if current_user.is_admin %}
+                        <!-- User Management (Admin Only) -->
+                        <div class="bg-white dark:bg-gray-800 shadow rounded-lg divide-y divide-gray-200 dark:divide-gray-700">
+                            <div class="p-6">
+                                <h2 class="text-lg font-medium text-gray-900 dark:text-white">{{ _('User Management') }}</h2>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ _('Manage users and permissions') }}</p>
+                            </div>
+
+                            <div class="p-6">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="text-sm font-medium text-gray-900 dark:text-white">{{ _('Users') }}</h3>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ _('View and manage all users') }}</p>
+                                    </div>
+                                    <a href="{{ url_for('auth.users') }}"
+                                       class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                        {{ _('Manage Users') }}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
                         <!-- Change Password -->
                         <div class="bg-white shadow rounded-lg divide-y divide-gray-200">
                             <div class="p-6">
@@ -228,6 +289,108 @@
                     </div>
                 </div>
             </form>
+
+            <!-- Menu & Navigation Section -->
+            <div id="section-menu" class="settings-section hidden">
+                <form method="POST" action="{{ url_for('auth.menu_preferences') }}">
+                    <div class="bg-white dark:bg-gray-800 shadow rounded-lg divide-y divide-gray-200 dark:divide-gray-700">
+                        <div class="p-6">
+                            <h2 class="text-lg font-medium text-gray-900 dark:text-white">{{ _('Menu & Navigation') }}</h2>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ _('Customize which menu items to show and your start page') }}</p>
+                        </div>
+
+                        <div class="p-6 space-y-6">
+                            <!-- Start Page -->
+                            <div>
+                                <label for="start_page" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ _('Start Page') }}</label>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">{{ _('Which page to show when you log in') }}</p>
+                                <select name="start_page" id="start_page"
+                                        class="block w-full sm:w-64 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
+                                    <option value="dashboard" {% if current_user.start_page == 'dashboard' or not current_user.start_page %}selected{% endif %}>{{ _('Dashboard') }}</option>
+                                    <option value="vehicles" {% if current_user.start_page == 'vehicles' %}selected{% endif %}>{{ _('Vehicles') }}</option>
+                                    <option value="fuel" {% if current_user.start_page == 'fuel' %}selected{% endif %}>{{ _('Fuel Logs') }}</option>
+                                    <option value="fuel_quick" {% if current_user.start_page == 'fuel_quick' %}selected{% endif %}>{{ _('Quick Fuel Entry') }}</option>
+                                    <option value="expenses" {% if current_user.start_page == 'expenses' %}selected{% endif %}>{{ _('Expenses') }}</option>
+                                    <option value="reminders" {% if current_user.start_page == 'reminders' %}selected{% endif %}>{{ _('Reminders') }}</option>
+                                    <option value="maintenance" {% if current_user.start_page == 'maintenance' %}selected{% endif %}>{{ _('Maintenance') }}</option>
+                                    <option value="recurring" {% if current_user.start_page == 'recurring' %}selected{% endif %}>{{ _('Recurring Expenses') }}</option>
+                                    <option value="documents" {% if current_user.start_page == 'documents' %}selected{% endif %}>{{ _('Documents') }}</option>
+                                    <option value="stations" {% if current_user.start_page == 'stations' %}selected{% endif %}>{{ _('Fuel Stations') }}</option>
+                                </select>
+                            </div>
+
+                            <!-- Quick Entry Button -->
+                            <div class="flex items-center justify-between py-3 border-t border-gray-200 dark:border-gray-700">
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-900 dark:text-white">{{ _('Quick Entry Button') }}</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ _('Show a quick fuel entry button in the navigation bar for rapid logging') }}</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="show_quick_entry" {% if current_user.show_quick_entry %}checked{% endif %}
+                                           class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                </label>
+                            </div>
+
+                            <!-- Menu Items -->
+                            <div class="pt-3 border-t border-gray-200 dark:border-gray-700">
+                                <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-3">{{ _('Show Menu Items') }}</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">{{ _('Choose which items appear in the navigation menu') }}</p>
+
+                                <div class="space-y-3">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="show_menu_vehicles" {% if current_user.show_menu_vehicles is not defined or current_user.show_menu_vehicles %}checked{% endif %}
+                                               class="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500">
+                                        <span class="ml-3 text-sm text-gray-700 dark:text-gray-300">{{ _('Vehicles') }}</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="show_menu_fuel" {% if current_user.show_menu_fuel is not defined or current_user.show_menu_fuel %}checked{% endif %}
+                                               class="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500">
+                                        <span class="ml-3 text-sm text-gray-700 dark:text-gray-300">{{ _('Fuel Logs') }}</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="show_menu_expenses" {% if current_user.show_menu_expenses is not defined or current_user.show_menu_expenses %}checked{% endif %}
+                                               class="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500">
+                                        <span class="ml-3 text-sm text-gray-700 dark:text-gray-300">{{ _('Expenses') }}</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="show_menu_reminders" {% if current_user.show_menu_reminders is not defined or current_user.show_menu_reminders %}checked{% endif %}
+                                               class="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500">
+                                        <span class="ml-3 text-sm text-gray-700 dark:text-gray-300">{{ _('Reminders') }}</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="show_menu_maintenance" {% if current_user.show_menu_maintenance is not defined or current_user.show_menu_maintenance %}checked{% endif %}
+                                               class="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500">
+                                        <span class="ml-3 text-sm text-gray-700 dark:text-gray-300">{{ _('Maintenance') }}</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="show_menu_recurring" {% if current_user.show_menu_recurring is not defined or current_user.show_menu_recurring %}checked{% endif %}
+                                               class="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500">
+                                        <span class="ml-3 text-sm text-gray-700 dark:text-gray-300">{{ _('Recurring Expenses') }}</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="show_menu_documents" {% if current_user.show_menu_documents is not defined or current_user.show_menu_documents %}checked{% endif %}
+                                               class="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500">
+                                        <span class="ml-3 text-sm text-gray-700 dark:text-gray-300">{{ _('Documents') }}</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="show_menu_stations" {% if current_user.show_menu_stations is not defined or current_user.show_menu_stations %}checked{% endif %}
+                                               class="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500">
+                                        <span class="ml-3 text-sm text-gray-700 dark:text-gray-300">{{ _('Fuel Stations') }}</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 rounded-b-lg flex justify-end">
+                            <button type="submit"
+                                    class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                                {{ _('Save Preferences') }}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
 
             <!-- Integrations Section (outside form as it has its own actions) -->
             <div id="section-integrations" class="settings-section hidden">
@@ -298,51 +461,6 @@
                         </div>
                     </div>
 
-                    {% if current_user.is_admin %}
-                    <!-- DVLA Integration (Admin Only) -->
-                    <div class="bg-white dark:bg-gray-800 shadow rounded-lg divide-y divide-gray-200 dark:divide-gray-700">
-                        <div class="p-6">
-                            <div class="flex items-center">
-                                <svg class="h-5 w-5 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                                </svg>
-                                <h2 class="text-lg font-medium text-gray-900 dark:text-white">{{ _('DVLA Integration') }}</h2>
-                                <span class="ml-2 px-2 py-1 text-xs font-medium bg-amber-100 text-amber-800 rounded">{{ _('Admin') }}</span>
-                            </div>
-                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ _('Look up UK vehicle MOT and tax status from DVLA') }}</p>
-                        </div>
-
-                        <form method="POST" action="{{ url_for('auth.dvla_settings') }}" class="p-6 space-y-4">
-                            <p class="text-sm text-gray-600 dark:text-gray-300">
-                                {{ _('The DVLA Vehicle Enquiry Service allows you to look up MOT status, tax status, and vehicle details for UK registered vehicles.') }}
-                                <a href="https://developer-portal.driver-vehicle-licensing.api.gov.uk/" target="_blank" class="text-primary-600 hover:underline">{{ _('Get an API key') }}</a>
-                            </p>
-
-                            <div>
-                                <label for="dvla_api_key" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ _('DVLA API Key') }}</label>
-                                <div class="mt-1 flex gap-2">
-                                    <input type="password" name="dvla_api_key" id="dvla_api_key"
-                                           value="{{ dvla_settings.api_key or '' }}"
-                                           placeholder="Enter your DVLA VES API key"
-                                           class="flex-1 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
-                                    <button type="button" onclick="testDvlaKey()"
-                                            class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                        {{ _('Test') }}
-                                    </button>
-                                </div>
-                                <span id="dvla-test-result" class="block mt-2 text-sm"></span>
-                            </div>
-
-                            <div class="flex justify-end">
-                                <button type="submit"
-                                        class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                                    {{ _('Save DVLA Settings') }}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                    {% endif %}
-
                     <!-- Export Data -->
                     <div class="bg-white shadow rounded-lg divide-y divide-gray-200">
                         <div class="p-6">
@@ -379,89 +497,423 @@
 
             <!-- API Section -->
             <div id="section-api" class="settings-section hidden">
-                <div class="bg-white shadow rounded-lg divide-y divide-gray-200">
-                    <div class="p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h2 class="text-lg font-medium text-gray-900">{{ _('API Access') }}</h2>
-                                <p class="mt-1 text-sm text-gray-500">{{ _('Connect external applications and services') }}</p>
+                <div class="space-y-6">
+                    <!-- API Access Card -->
+                    <div class="bg-white dark:bg-gray-800 shadow rounded-lg divide-y divide-gray-200 dark:divide-gray-700">
+                        <div class="p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h2 class="text-lg font-medium text-gray-900 dark:text-white">{{ _('API Access') }}</h2>
+                                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ _('Generate API keys to connect external applications') }}</p>
+                                </div>
+                                <a href="{{ url_for('api.docs') }}" class="text-sm text-primary-600 hover:text-primary-500">{{ _('View API Docs') }} &rarr;</a>
                             </div>
-                            <a href="{{ url_for('api.docs') }}" class="text-sm text-primary-600 hover:text-primary-500">{{ _('View API Docs') }} &rarr;</a>
                         </div>
-                    </div>
 
-                    <div class="p-6">
-                        <div id="api-key-section">
-                            {% if current_user.api_key %}
-                            <!-- API Key Exists -->
-                            <div>
-                                <h3 class="text-sm font-medium text-gray-900 mb-2">{{ _('Your API Key') }}</h3>
-                                <div class="flex items-center gap-3 mb-3">
-                                    <div class="flex-1 relative">
-                                        <input type="password" id="api-key-display" readonly
-                                               value="{{ current_user.api_key }}"
-                                               class="block w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 pr-20 text-sm font-mono">
-                                        <button type="button" onclick="toggleApiKeyVisibility()"
-                                                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                                            <svg id="eye-icon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                            </svg>
-                                            <svg id="eye-off-icon" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
-                                            </svg>
+                        <div class="p-6">
+                            <div id="api-key-section">
+                                {% if current_user.api_key %}
+                                <!-- API Key Exists -->
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-2">{{ _('Your API Key') }}</h3>
+                                    <div class="flex items-center gap-3 mb-3">
+                                        <div class="flex-1 relative">
+                                            <input type="password" id="api-key-display" readonly
+                                                   value="{{ current_user.api_key }}"
+                                                   class="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white px-3 py-2 pr-20 text-sm font-mono">
+                                            <button type="button" onclick="toggleApiKeyVisibility()"
+                                                    class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                                <svg id="eye-icon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                </svg>
+                                                <svg id="eye-off-icon" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        <button type="button" onclick="copyApiKey()"
+                                                class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                            {{ _('Copy') }}
                                         </button>
                                     </div>
-                                    <button type="button" onclick="copyApiKey()"
-                                            class="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                                        {{ _('Copy') }}
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">{{ _('Created') }}: {{ current_user.api_key_created_at.strftime('%B %d, %Y at %H:%M') }}</p>
+                                    <div class="flex gap-3">
+                                        <button type="button" onclick="regenerateApiKey()"
+                                                class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                            {{ _('Regenerate Key') }}
+                                        </button>
+                                        <button type="button" onclick="revokeApiKey()"
+                                                class="px-4 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-white hover:bg-red-50">
+                                            {{ _('Revoke Key') }}
+                                        </button>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <!-- No API Key -->
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-2">{{ _('API Key') }}</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">{{ _('Generate an API key to access May programmatically. You can use it to integrate with other applications or build your own tools.') }}</p>
+                                    <button type="button" onclick="generateApiKey()"
+                                            class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700">
+                                        {{ _('Generate API Key') }}
                                     </button>
                                 </div>
-                                <p class="text-xs text-gray-500 mb-4">{{ _('Created') }}: {{ current_user.api_key_created_at.strftime('%B %d, %Y at %H:%M') }}</p>
-                                <div class="flex gap-3">
-                                    <button type="button" onclick="regenerateApiKey()"
-                                            class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                                        {{ _('Regenerate Key') }}
-                                    </button>
-                                    <button type="button" onclick="revokeApiKey()"
-                                            class="px-4 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-white hover:bg-red-50">
-                                        {{ _('Revoke Key') }}
-                                    </button>
+                                {% endif %}
+                            </div>
+
+                            <!-- New Key Display (hidden by default) -->
+                            <div id="new-key-display" class="hidden">
+                                <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                                    <h3 class="text-sm font-medium text-green-800 mb-2">{{ _('API Key Generated') }}</h3>
+                                    <p class="text-xs text-green-700 mb-3">{{ _('Copy your API key now. For security, it won\'t be shown in full again.') }}</p>
+                                    <div class="flex items-center gap-2">
+                                        <code id="new-api-key" class="flex-1 block bg-white border border-green-300 rounded px-3 py-2 text-sm font-mono break-all"></code>
+                                        <button type="button" onclick="copyNewApiKey()"
+                                                class="px-3 py-2 border border-green-300 rounded-md text-sm font-medium text-green-700 bg-white hover:bg-green-50">
+                                            {{ _('Copy') }}
+                                        </button>
+                                    </div>
+                                </div>
+                                <button type="button" onclick="location.reload()"
+                                        class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                                    {{ _('Done') }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Integrations Section -->
+            <div id="section-services" class="settings-section hidden">
+                <!-- Integration Cards (Landing View) -->
+                <div id="integrations-list">
+                    <div class="mb-6">
+                        <h2 class="text-lg font-medium text-gray-900 dark:text-white">{{ _('Integrations') }}</h2>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ _('Connect May with external services and applications') }}</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Calendar Card -->
+                        <button type="button" onclick="showIntegration('calendar')"
+                                class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 text-left hover:shadow-md hover:border-primary-300 border-2 border-transparent transition-all">
+                            <div class="flex items-center mb-3">
+                                <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
+                                    <svg class="h-6 w-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-gray-900 dark:text-white">{{ _('Calendar') }}</h3>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ _('Subscribe to reminders in your calendar app') }}</p>
+                            {% if current_user.api_key %}
+                            <span class="mt-3 inline-flex items-center px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 rounded">{{ _('Ready') }}</span>
+                            {% else %}
+                            <span class="mt-3 inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400 rounded">{{ _('Requires API key') }}</span>
+                            {% endif %}
+                        </button>
+
+                        <!-- Home Assistant Card -->
+                        <button type="button" onclick="showIntegration('homeassistant')"
+                                class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 text-left hover:shadow-md hover:border-primary-300 border-2 border-transparent transition-all">
+                            <div class="flex items-center mb-3">
+                                <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center">
+                                    <svg class="h-6 w-6 text-cyan-600 dark:text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-gray-900 dark:text-white">{{ _('Home Assistant') }}</h3>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ _('Create sensors and automations for your vehicles') }}</p>
+                            {% if current_user.api_key %}
+                            <span class="mt-3 inline-flex items-center px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 rounded">{{ _('Ready') }}</span>
+                            {% else %}
+                            <span class="mt-3 inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400 rounded">{{ _('Requires API key') }}</span>
+                            {% endif %}
+                        </button>
+
+                        {% if current_user.is_admin %}
+                        <!-- DVLA Card (Admin Only) -->
+                        <button type="button" onclick="showIntegration('dvla')"
+                                class="bg-white dark:bg-gray-800 shadow rounded-lg p-6 text-left hover:shadow-md hover:border-primary-300 border-2 border-transparent transition-all">
+                            <div class="flex items-center mb-3">
+                                <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                                    <svg class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-gray-900 dark:text-white">{{ _('DVLA') }}</h3>
+                                    <span class="px-1.5 py-0.5 text-xs font-medium bg-amber-100 text-amber-800 rounded">{{ _('Admin') }}</span>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ _('Look up UK vehicle MOT and tax status') }}</p>
+                            {% if dvla_settings.api_key %}
+                            <span class="mt-3 inline-flex items-center px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 rounded">{{ _('Configured') }}</span>
+                            {% else %}
+                            <span class="mt-3 inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400 rounded">{{ _('Not configured') }}</span>
+                            {% endif %}
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Calendar Integration Detail -->
+                <div id="integration-calendar" class="integration-detail hidden">
+                    <div class="mb-6">
+                        <button type="button" onclick="hideIntegration()" class="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 mb-4">
+                            <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                            {{ _('Back to Integrations') }}
+                        </button>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 shadow rounded-lg divide-y divide-gray-200 dark:divide-gray-700">
+                        <div class="p-6">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
+                                    <svg class="h-7 w-7 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <h2 class="text-lg font-medium text-gray-900 dark:text-white">{{ _('Calendar Subscription') }}</h2>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ _('Subscribe to your reminders in any calendar app') }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            {% if current_user.api_key %}
+                            <div class="space-y-4">
+                                <p class="text-sm text-gray-600 dark:text-gray-300">{{ _('Add this calendar to Apple Calendar, Google Calendar, Outlook, or any other calendar app that supports iCal subscriptions.') }}</p>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('Webcal URL') }}</label>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">{{ _('Use this URL for most calendar apps (Apple Calendar, Outlook, etc.)') }}</p>
+                                    <div class="flex items-center gap-2">
+                                        <input type="text" readonly id="webcal-url"
+                                               value="webcal://{{ request.host }}/api/calendar/feed?token={{ current_user.api_key }}"
+                                               class="flex-1 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-3 py-2 text-sm font-mono text-gray-600 dark:text-gray-300">
+                                        <button type="button" onclick="copyToClipboard('webcal-url')"
+                                                class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                            {{ _('Copy') }}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('HTTPS URL') }}</label>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">{{ _('Use this URL for Google Calendar') }}</p>
+                                    <div class="flex items-center gap-2">
+                                        <input type="text" readonly id="https-calendar-url"
+                                               value="{{ request.url_root.rstrip('/') }}/api/calendar/feed?token={{ current_user.api_key }}"
+                                               class="flex-1 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-3 py-2 text-sm font-mono text-gray-600 dark:text-gray-300">
+                                        <button type="button" onclick="copyToClipboard('https-calendar-url')"
+                                                class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                            {{ _('Copy') }}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                    <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-2">{{ _('What\'s included in the calendar?') }}</h4>
+                                    <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                                        <li class="flex items-center"><svg class="w-4 h-4 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>{{ _('Maintenance schedules') }}</li>
+                                        <li class="flex items-center"><svg class="w-4 h-4 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>{{ _('Recurring expense due dates') }}</li>
+                                        <li class="flex items-center"><svg class="w-4 h-4 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>{{ _('Document expiry dates') }}</li>
+                                        <li class="flex items-center"><svg class="w-4 h-4 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>{{ _('Custom reminders') }}</li>
+                                    </ul>
                                 </div>
                             </div>
                             {% else %}
-                            <!-- No API Key -->
-                            <div>
-                                <h3 class="text-sm font-medium text-gray-900 mb-2">{{ _('API Key') }}</h3>
-                                <p class="text-sm text-gray-500 mb-4">{{ _('Generate an API key to access May programmatically. You can use it to integrate with other applications or build your own tools.') }}</p>
-                                <button type="button" onclick="generateApiKey()"
-                                        class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700">
-                                    {{ _('Generate API Key') }}
+                            <div class="text-center py-8">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                                </svg>
+                                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{{ _('API Key Required') }}</h3>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ _('Generate an API key in the API section to enable calendar integration.') }}</p>
+                                <button type="button" onclick="showSection('api')"
+                                        class="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700">
+                                    {{ _('Go to API Settings') }}
                                 </button>
                             </div>
                             {% endif %}
                         </div>
+                    </div>
+                </div>
 
-                        <!-- New Key Display (hidden by default) -->
-                        <div id="new-key-display" class="hidden">
-                            <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-                                <h3 class="text-sm font-medium text-green-800 mb-2">{{ _('API Key Generated') }}</h3>
-                                <p class="text-xs text-green-700 mb-3">{{ _('Copy your API key now. For security, it won\'t be shown in full again.') }}</p>
-                                <div class="flex items-center gap-2">
-                                    <code id="new-api-key" class="flex-1 block bg-white border border-green-300 rounded px-3 py-2 text-sm font-mono break-all"></code>
-                                    <button type="button" onclick="copyNewApiKey()"
-                                            class="px-3 py-2 border border-green-300 rounded-md text-sm font-medium text-green-700 bg-white hover:bg-green-50">
-                                        {{ _('Copy') }}
-                                    </button>
+                <!-- Home Assistant Integration Detail -->
+                <div id="integration-homeassistant" class="integration-detail hidden">
+                    <div class="mb-6">
+                        <button type="button" onclick="hideIntegration()" class="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 mb-4">
+                            <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                            {{ _('Back to Integrations') }}
+                        </button>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 shadow rounded-lg divide-y divide-gray-200 dark:divide-gray-700">
+                        <div class="p-6">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center">
+                                    <svg class="h-7 w-7 text-cyan-600 dark:text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <h2 class="text-lg font-medium text-gray-900 dark:text-white">{{ _('Home Assistant') }}</h2>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ _('Create sensors and automations for your vehicles') }}</p>
                                 </div>
                             </div>
-                            <button type="button" onclick="location.reload()"
-                                    class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                                {{ _('Done') }}
-                            </button>
+                        </div>
+
+                        <div class="p-6">
+                            {% if current_user.api_key %}
+                            <div class="space-y-6">
+                                <p class="text-sm text-gray-600 dark:text-gray-300">{{ _('Add the following configuration to your Home Assistant configuration.yaml to create vehicle sensors.') }}</p>
+
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-2">{{ _('REST Sensor Configuration') }}</h4>
+                                    <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+                                        <pre class="text-sm text-gray-100"><code>sensor:
+  - platform: rest
+    name: "May Vehicle Stats"
+    resource: {{ request.url_root.rstrip('/') }}/api/ha/summary
+    headers:
+      Authorization: Bearer {{ current_user.api_key }}
+    value_template: "{{ '{{' }} value_json.alerts_count {{ '}}' }}"
+    json_attributes:
+      - total_vehicles
+      - total_cost
+      - total_fuel_cost
+      - vehicles</code></pre>
+                                    </div>
+                                    <button type="button" onclick="copyHAConfig()"
+                                            class="mt-2 text-sm text-primary-600 hover:text-primary-500">{{ _('Copy configuration') }}</button>
+                                </div>
+
+                                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                    <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">{{ _('Available API Endpoints') }}</h4>
+                                    <div class="space-y-2 text-sm">
+                                        <div class="flex justify-between">
+                                            <code class="text-gray-600 dark:text-gray-300">/api/ha/status</code>
+                                            <span class="text-gray-500 dark:text-gray-400">{{ _('API health check') }}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <code class="text-gray-600 dark:text-gray-300">/api/ha/vehicles</code>
+                                            <span class="text-gray-500 dark:text-gray-400">{{ _('List all vehicles') }}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <code class="text-gray-600 dark:text-gray-300">/api/ha/vehicles/{id}/stats</code>
+                                            <span class="text-gray-500 dark:text-gray-400">{{ _('Vehicle statistics') }}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <code class="text-gray-600 dark:text-gray-300">/api/ha/alerts</code>
+                                            <span class="text-gray-500 dark:text-gray-400">{{ _('Upcoming reminders') }}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <code class="text-gray-600 dark:text-gray-300">/api/ha/summary</code>
+                                            <span class="text-gray-500 dark:text-gray-400">{{ _('Combined summary') }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="text-center py-8">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                                </svg>
+                                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">{{ _('API Key Required') }}</h3>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ _('Generate an API key in the API section to enable Home Assistant integration.') }}</p>
+                                <button type="button" onclick="showSection('api')"
+                                        class="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700">
+                                    {{ _('Go to API Settings') }}
+                                </button>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
+
+                <!-- DVLA Integration Detail (Admin Only) -->
+                {% if current_user.is_admin %}
+                <div id="integration-dvla" class="integration-detail hidden">
+                    <div class="mb-6">
+                        <button type="button" onclick="hideIntegration()" class="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 mb-4">
+                            <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                            {{ _('Back to Integrations') }}
+                        </button>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 shadow rounded-lg divide-y divide-gray-200 dark:divide-gray-700">
+                        <div class="p-6">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                                    <svg class="h-7 w-7 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <h2 class="text-lg font-medium text-gray-900 dark:text-white">{{ _('DVLA Vehicle Lookup') }}</h2>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ _('Look up UK vehicle MOT and tax status') }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            <div class="space-y-4">
+                                <p class="text-sm text-gray-600 dark:text-gray-300">
+                                    {{ _('The DVLA Vehicle Enquiry Service allows you to look up MOT status, tax status, and vehicle details for UK registered vehicles. This enables automatic population of vehicle information when adding new vehicles.') }}
+                                </p>
+
+                                <div class="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                                    <h4 class="text-sm font-medium text-blue-800 dark:text-blue-300 mb-2">{{ _('How to get an API key') }}</h4>
+                                    <ol class="text-sm text-blue-700 dark:text-blue-400 list-decimal list-inside space-y-1">
+                                        <li>{{ _('Visit the') }} <a href="https://developer-portal.driver-vehicle-licensing.api.gov.uk/" target="_blank" class="underline">{{ _('DVLA Developer Portal') }}</a></li>
+                                        <li>{{ _('Register for a free account') }}</li>
+                                        <li>{{ _('Subscribe to the Vehicle Enquiry Service API') }}</li>
+                                        <li>{{ _('Copy your API key and paste it below') }}</li>
+                                    </ol>
+                                </div>
+
+                                <form method="POST" action="{{ url_for('auth.dvla_settings') }}" class="space-y-4">
+                                    <div>
+                                        <label for="dvla_api_key" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('DVLA API Key') }}</label>
+                                        <div class="flex gap-2">
+                                            <input type="password" name="dvla_api_key" id="dvla_api_key"
+                                                   value="{{ dvla_settings.api_key or '' }}"
+                                                   placeholder="Enter your DVLA VES API key"
+                                                   class="flex-1 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
+                                            <button type="button" onclick="testDvlaKey()"
+                                                    class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                                {{ _('Test') }}
+                                            </button>
+                                        </div>
+                                        <span id="dvla-test-result" class="block mt-2 text-sm"></span>
+                                    </div>
+
+                                    <div class="flex justify-end">
+                                        <button type="submit"
+                                                class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700">
+                                            {{ _('Save DVLA Settings') }}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
             </div>
 
             <!-- Notifications Section -->
@@ -899,6 +1351,14 @@ function showSection(section) {
     });
     event.currentTarget.classList.add('active');
 
+    // Reset integrations view to overview when clicking the nav link
+    if (section === 'services') {
+        document.getElementById('integrations-list').classList.remove('hidden');
+        document.querySelectorAll('.integration-detail').forEach(el => {
+            el.classList.add('hidden');
+        });
+    }
+
     // Update URL hash without scrolling
     history.replaceState(null, null, '#' + section);
 }
@@ -906,7 +1366,7 @@ function showSection(section) {
 // Handle initial hash on page load
 document.addEventListener('DOMContentLoaded', function() {
     const hash = window.location.hash.slice(1);
-    if (hash && ['units', 'account', 'integrations', 'api', 'notifications', 'branding'].includes(hash)) {
+    if (hash && ['units', 'account', 'menu', 'integrations', 'api', 'services', 'notifications', 'branding'].includes(hash)) {
         const navItem = document.querySelector(`a[href="#${hash}"]`);
         if (navItem) {
             navItem.click();
@@ -944,6 +1404,13 @@ function copyApiKey() {
     const input = document.getElementById('api-key-display');
     navigator.clipboard.writeText(input.value).then(() => {
         alert('API key copied to clipboard');
+    });
+}
+
+function copyToClipboard(elementId) {
+    const input = document.getElementById(elementId);
+    navigator.clipboard.writeText(input.value).then(() => {
+        alert('Copied to clipboard');
     });
 }
 
@@ -1118,5 +1585,61 @@ function testDvlaKey() {
             console.error(err);
         });
 }
+
+// Integration sub-page navigation
+function showIntegration(name) {
+    // Hide the integrations list
+    document.getElementById('integrations-list').classList.add('hidden');
+
+    // Hide all integration details
+    document.querySelectorAll('.integration-detail').forEach(el => {
+        el.classList.add('hidden');
+    });
+
+    // Show the selected integration
+    const detail = document.getElementById('integration-' + name);
+    if (detail) {
+        detail.classList.remove('hidden');
+    }
+
+    // Update URL hash
+    history.replaceState(null, null, '#services-' + name);
+}
+
+function hideIntegration() {
+    // Show the integrations list
+    document.getElementById('integrations-list').classList.remove('hidden');
+
+    // Hide all integration details
+    document.querySelectorAll('.integration-detail').forEach(el => {
+        el.classList.add('hidden');
+    });
+
+    // Update URL hash
+    history.replaceState(null, null, '#services');
+}
+
+// Copy Home Assistant configuration
+function copyHAConfig() {
+    const config = document.querySelector('#integration-homeassistant pre code').textContent;
+    navigator.clipboard.writeText(config).then(() => {
+        alert('Configuration copied to clipboard');
+    });
+}
+
+// Handle integration deep links on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const hash = window.location.hash;
+    if (hash.startsWith('#services-')) {
+        const integrationName = hash.replace('#services-', '');
+        // First show the services section
+        const servicesNav = document.querySelector('a[href="#services"]');
+        if (servicesNav) {
+            servicesNav.click();
+            // Then show the specific integration
+            setTimeout(() => showIntegration(integrationName), 0);
+        }
+    }
+});
 </script>
 {% endblock %}

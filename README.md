@@ -4,7 +4,7 @@
 
 A modern, self-hosted vehicle management application for tracking fuel consumption, expenses, reminders, and maintenance across your entire fleet.
 
-![Flask](https://img.shields.io/badge/Flask-Python-blue) ![Version](https://img.shields.io/badge/version-0.2.0-blue) ![License](https://img.shields.io/badge/license-MIT-green) ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED) ![PWA](https://img.shields.io/badge/PWA-Ready-5A0FC8)
+![Flask](https://img.shields.io/badge/Flask-Python-blue) ![Version](https://img.shields.io/badge/version-0.3.0-blue) ![License](https://img.shields.io/badge/license-MIT-green) ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED) ![PWA](https://img.shields.io/badge/PWA-Ready-5A0FC8)
 
 Named after James May, completing the trio of Top Gear presenters (alongside [Clarkson](https://github.com/linuxserver/Clarkson) and [Hammond](https://github.com/AlfHou/hammond)).
 
@@ -12,14 +12,20 @@ Named after James May, completing the trio of Top Gear presenters (alongside [Cl
 
 - **🚗 Multi-Vehicle Support**: Track cars, vans, motorbikes, and scooters with custom vehicle types
 - **⛽ Fuel Logging**: Record fill-ups with automatic consumption calculations (L/100km, MPG)
+- **⚡ Quick Entry Mode**: Rapid fuel logging with a streamlined interface
 - **💰 Expense Tracking**: Monitor maintenance, insurance, repairs, tax, and other costs by category
+- **🔄 Recurring Expenses**: Track regular payments like insurance, tax, and subscriptions
+- **🔧 Maintenance Schedules**: Plan and track scheduled maintenance with mileage/date intervals
 - **📅 Reminders**: Set up recurring reminders for MOT, service, insurance, and tax renewals
 - **🔔 Multi-Channel Notifications**: Get reminded via Email, ntfy, Pushover, or Webhooks
+- **📁 Document Storage**: Store important documents (insurance, registration, manuals) per vehicle
+- **⛽ Favorite Stations**: Save and quickly select your preferred fuel stations
 - **👥 Multi-User**: Share vehicles between family members or team members
 - **📊 Analytics Dashboard**: View spending trends and consumption statistics with interactive charts
 - **📎 Attachment Support**: Upload receipts and documents to fuel logs and expenses
 - **📄 PDF Reports**: Generate comprehensive vehicle reports for record-keeping
 - **🔧 Customizable Units**: Support for metric/imperial, multiple currencies
+- **🎛️ Menu Customization**: Show/hide menu items and set your preferred start page
 - **🌍 Internationalization**: Available in multiple languages (English, German, Spanish, French, and more)
 - **🎨 Custom Branding**: Personalize with your own logo, colors, and app name
 - **🌙 Dark Mode**: Toggle between light and dark themes
@@ -27,6 +33,8 @@ Named after James May, completing the trio of Top Gear presenters (alongside [Cl
 - **🇬🇧 DVLA Integration**: Look up UK vehicle MOT and tax status automatically
 - **📱 PWA Support**: Install as a mobile app with offline capabilities
 - **🔌 REST API**: Full API access for integrations and automation
+- **🏠 Home Assistant Integration**: Create sensors and automations for your vehicles
+- **📆 Calendar Subscription**: Subscribe to reminders in Apple Calendar, Google Calendar, Outlook
 - **🐳 Docker Ready**: Easy self-hosting via Docker
 
 ## 📦 Installation
@@ -126,6 +134,35 @@ Never miss important dates:
 - Tax payments
 - Custom reminders with flexible recurrence
 
+### Maintenance Schedules
+Plan regular maintenance tasks:
+- Set intervals by mileage or time (e.g., oil change every 10,000 km or 12 months)
+- Track completion history
+- Automatic reminder generation
+- Link to expenses when completed
+
+### Recurring Expenses
+Track regular payments:
+- Insurance premiums
+- Road tax
+- Subscriptions and memberships
+- Custom recurrence patterns (monthly, quarterly, yearly)
+- Automatic calendar integration
+
+### Documents
+Store important vehicle documents:
+- Insurance certificates
+- Registration documents
+- Service manuals
+- MOT certificates
+- Any file type with expiry date tracking
+
+### Fuel Stations
+Save your favorite stations:
+- Quick selection during fuel logging
+- Track prices at different stations
+- Notes and location information
+
 ### Notifications
 Configure your preferred notification method:
 - **Email**: SMTP server configuration (admin)
@@ -153,6 +190,39 @@ curl -H "Authorization: Bearer may_your_api_key" \
 ```
 
 See the API documentation at `/api/docs` when logged in.
+
+## 🔗 Integrations
+
+### Home Assistant
+Create vehicle sensors in Home Assistant:
+
+```yaml
+sensor:
+  - platform: rest
+    name: "May Vehicle Stats"
+    resource: http://your-may-instance/api/ha/summary
+    headers:
+      Authorization: Bearer may_your_api_key
+    value_template: "{{ value_json.alerts_count }}"
+    json_attributes:
+      - total_vehicles
+      - total_cost
+```
+
+Available endpoints: `/api/ha/status`, `/api/ha/vehicles`, `/api/ha/alerts`, `/api/ha/summary`
+
+### Calendar Subscription
+Subscribe to reminders in your calendar app:
+
+1. Go to Settings > Integrations > Calendar
+2. Copy the webcal URL (for Apple Calendar, Outlook) or HTTPS URL (for Google Calendar)
+3. Add as a subscribed calendar in your app
+
+The calendar includes:
+- Maintenance schedules
+- Recurring expense due dates
+- Document expiry dates
+- Custom reminders
 
 ## 🛠️ Tech Stack
 

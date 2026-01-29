@@ -12,7 +12,7 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('main.dashboard'))
+        return redirect(get_start_page_url(current_user))
 
     if request.method == 'POST':
         username = request.form.get('username')
@@ -24,11 +24,30 @@ def login():
         if user and user.check_password(password):
             login_user(user, remember=remember)
             next_page = request.args.get('next')
-            return redirect(next_page or url_for('main.dashboard'))
+            return redirect(next_page or get_start_page_url(user))
 
         flash('Invalid username or password', 'error')
 
     return render_template('auth/login.html')
+
+
+def get_start_page_url(user):
+    """Get the URL for the user's configured start page."""
+    start_page = user.start_page or 'dashboard'
+    page_routes = {
+        'dashboard': 'main.dashboard',
+        'vehicles': 'vehicles.index',
+        'fuel': 'fuel.index',
+        'fuel_quick': 'fuel.quick',
+        'expenses': 'expenses.index',
+        'reminders': 'reminders.index',
+        'maintenance': 'maintenance.index',
+        'recurring': 'recurring.index',
+        'documents': 'documents.index',
+        'stations': 'stations.index',
+    }
+    route = page_routes.get(start_page, 'main.dashboard')
+    return url_for(route)
 
 
 @bp.route('/register', methods=['GET', 'POST'])
@@ -163,6 +182,25 @@ def notifications():
     return redirect(url_for('auth.settings') + '#notifications')
 
 
+@bp.route('/menu-preferences', methods=['POST'])
+@login_required
+def menu_preferences():
+    """Update user menu preferences"""
+    current_user.start_page = request.form.get('start_page', 'dashboard')
+    current_user.show_menu_vehicles = request.form.get('show_menu_vehicles') == 'on'
+    current_user.show_menu_fuel = request.form.get('show_menu_fuel') == 'on'
+    current_user.show_menu_expenses = request.form.get('show_menu_expenses') == 'on'
+    current_user.show_menu_reminders = request.form.get('show_menu_reminders') == 'on'
+    current_user.show_menu_maintenance = request.form.get('show_menu_maintenance') == 'on'
+    current_user.show_menu_recurring = request.form.get('show_menu_recurring') == 'on'
+    current_user.show_menu_documents = request.form.get('show_menu_documents') == 'on'
+    current_user.show_menu_stations = request.form.get('show_menu_stations') == 'on'
+    current_user.show_quick_entry = request.form.get('show_quick_entry') == 'on'
+    db.session.commit()
+    flash('Menu preferences updated', 'success')
+    return redirect(url_for('auth.settings') + '#menu')
+
+
 @bp.route('/smtp-settings', methods=['POST'])
 @login_required
 def smtp_settings():
@@ -233,7 +271,7 @@ def dvla_settings():
     AppSettings.set('dvla_api_key', api_key)
 
     flash('DVLA settings updated', 'success')
-    return redirect(url_for('auth.settings') + '#integrations')
+    return redirect(url_for('auth.settings') + '#services-dvla')
 
 
 @bp.route('/users')

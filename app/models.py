@@ -41,6 +41,18 @@ class User(UserMixin, db.Model):
     api_key = db.Column(db.String(64), unique=True, index=True)
     api_key_created_at = db.Column(db.DateTime)
 
+    # Menu preferences
+    start_page = db.Column(db.String(50), default='dashboard')  # dashboard, vehicles, fuel, expenses, etc.
+    show_menu_vehicles = db.Column(db.Boolean, default=True)
+    show_menu_fuel = db.Column(db.Boolean, default=True)
+    show_menu_expenses = db.Column(db.Boolean, default=True)
+    show_menu_reminders = db.Column(db.Boolean, default=True)
+    show_menu_maintenance = db.Column(db.Boolean, default=True)
+    show_menu_recurring = db.Column(db.Boolean, default=True)
+    show_menu_documents = db.Column(db.Boolean, default=True)
+    show_menu_stations = db.Column(db.Boolean, default=True)
+    show_quick_entry = db.Column(db.Boolean, default=False)  # Show quick entry button in navbar
+
     # Relationships
     owned_vehicles = db.relationship('Vehicle', backref='owner', lazy='dynamic',
                                      foreign_keys='Vehicle.owner_id')
@@ -507,3 +519,264 @@ RECURRENCE_OPTIONS = [
     ('biannual', 'Every 6 months'),
     ('yearly', 'Yearly'),
 ]
+
+# Maintenance schedule types
+MAINTENANCE_TYPES = [
+    ('oil_change', 'Oil Change'),
+    ('oil_filter', 'Oil Filter'),
+    ('air_filter', 'Air Filter'),
+    ('cabin_filter', 'Cabin/Pollen Filter'),
+    ('fuel_filter', 'Fuel Filter'),
+    ('spark_plugs', 'Spark Plugs'),
+    ('brake_pads', 'Brake Pads'),
+    ('brake_fluid', 'Brake Fluid'),
+    ('coolant', 'Coolant Flush'),
+    ('transmission', 'Transmission Service'),
+    ('timing_belt', 'Timing Belt'),
+    ('serpentine_belt', 'Serpentine Belt'),
+    ('tire_rotation', 'Tire Rotation'),
+    ('wheel_alignment', 'Wheel Alignment'),
+    ('battery', 'Battery Check/Replace'),
+    ('wiper_blades', 'Wiper Blades'),
+    ('full_service', 'Full Service'),
+    ('custom', 'Custom'),
+]
+
+# Document types
+DOCUMENT_TYPES = [
+    ('insurance', 'Insurance Policy'),
+    ('registration', 'Registration/V5C'),
+    ('mot', 'MOT Certificate'),
+    ('service_record', 'Service Record'),
+    ('purchase', 'Purchase Invoice'),
+    ('warranty', 'Warranty Document'),
+    ('manual', 'Owner\'s Manual'),
+    ('other', 'Other'),
+]
+
+
+class MaintenanceSchedule(db.Model):
+    """Predefined maintenance schedules with mileage/time intervals"""
+    __tablename__ = 'maintenance_schedules'
+
+    id = db.Column(db.Integer, primary_key=True)
+    vehicle_id = db.Column(db.Integer, db.ForeignKey('vehicles.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    name = db.Column(db.String(100), nullable=False)
+    maintenance_type = db.Column(db.String(50), nullable=False)
+    description = db.Column(db.Text)
+
+    # Interval settings (either or both)
+    interval_miles = db.Column(db.Integer)  # e.g., every 5000 miles
+    interval_km = db.Column(db.Integer)  # e.g., every 8000 km
+    interval_months = db.Column(db.Integer)  # e.g., every 12 months
+
+    # Last performed
+    last_performed_date = db.Column(db.Date)
+    last_performed_odometer = db.Column(db.Float)
+
+    # Next due (calculated or manually set)
+    next_due_date = db.Column(db.Date)
+    next_due_odometer = db.Column(db.Float)
+
+    # Estimated cost for budgeting
+    estimated_cost = db.Column(db.Float)
+
+    # Auto-create reminder when due
+    auto_remind = db.Column(db.Boolean, default=True)
+    remind_days_before = db.Column(db.Integer, default=14)
+    remind_miles_before = db.Column(db.Integer, default=500)
+
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    vehicle = db.relationship('Vehicle', backref=db.backref('maintenance_schedules', lazy='dynamic', cascade='all, delete-orphan'))
+    user = db.relationship('User', backref=db.backref('maintenance_schedules', lazy='dynamic'))
+
+    def calculate_next_due(self):
+        """Calculate next due date/odometer based on intervals"""
+        from datetime import date
+        from dateutil.relativedelta import relativedelta
+
+        if self.last_performed_date and self.interval_months:
+            self.next_due_date = self.last_performed_date + relativedelta(months=self.interval_months)
+
+        if self.last_performed_odometer:
+            if self.interval_km:
+                self.next_due_odometer = self.last_performed_odometer + self.interval_km
+            elif self.interval_miles:
+                self.next_due_odometer = self.last_performed_odometer + (self.interval_miles * 1.60934)
+
+    def is_due(self, current_odometer=None):
+        """Check if maintenance is due"""
+        from datetime import date
+
+        # Check date-based
+        if self.next_due_date and self.next_due_date <= date.today():
+            return True
+
+        # Check odometer-based
+        if self.next_due_odometer and current_odometer:
+            if current_odometer >= self.next_due_odometer:
+                return True
+
+        return False
+
+    def is_due_soon(self, current_odometer=None, days=14, distance=500):
+        """Check if maintenance is due soon"""
+        from datetime import date, timedelta
+
+        # Check date-based
+        if self.next_due_date:
+            if self.next_due_date <= date.today() + timedelta(days=days):
+                return True
+
+        # Check odometer-based
+        if self.next_due_odometer and current_odometer:
+            if current_odometer >= (self.next_due_odometer - distance):
+                return True
+
+        return False
+
+
+class RecurringExpense(db.Model):
+    """Recurring expenses that auto-generate expense entries"""
+    __tablename__ = 'recurring_expenses'
+
+    id = db.Column(db.Integer, primary_key=True)
+    vehicle_id = db.Column(db.Integer, db.ForeignKey('vehicles.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    name = db.Column(db.String(100), nullable=False)
+    category = db.Column(db.String(50), nullable=False)
+    description = db.Column(db.String(200))
+    amount = db.Column(db.Float, nullable=False)
+    vendor = db.Column(db.String(100))
+
+    # Recurrence settings
+    frequency = db.Column(db.String(20), nullable=False)  # weekly, monthly, quarterly, yearly
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date)  # optional end date
+
+    # Tracking
+    last_generated = db.Column(db.Date)
+    next_due = db.Column(db.Date)
+
+    # Auto-create setting
+    auto_create = db.Column(db.Boolean, default=True)  # auto-create expense when due
+    notify_before_days = db.Column(db.Integer, default=3)
+
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationships
+    vehicle = db.relationship('Vehicle', backref=db.backref('recurring_expenses', lazy='dynamic', cascade='all, delete-orphan'))
+    user = db.relationship('User', backref=db.backref('recurring_expenses', lazy='dynamic'))
+
+    def calculate_next_due(self):
+        """Calculate next due date based on frequency"""
+        from datetime import date
+        from dateutil.relativedelta import relativedelta
+
+        base_date = self.last_generated or self.start_date
+
+        if self.frequency == 'weekly':
+            self.next_due = base_date + relativedelta(weeks=1)
+        elif self.frequency == 'monthly':
+            self.next_due = base_date + relativedelta(months=1)
+        elif self.frequency == 'quarterly':
+            self.next_due = base_date + relativedelta(months=3)
+        elif self.frequency == 'yearly':
+            self.next_due = base_date + relativedelta(years=1)
+
+        # Check if past end date
+        if self.end_date and self.next_due > self.end_date:
+            self.is_active = False
+
+
+class FuelStation(db.Model):
+    """Favorite fuel stations"""
+    __tablename__ = 'fuel_stations'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    name = db.Column(db.String(100), nullable=False)
+    brand = db.Column(db.String(50))  # Shell, BP, Esso, etc.
+    address = db.Column(db.String(255))
+    city = db.Column(db.String(100))
+    postcode = db.Column(db.String(20))
+
+    # Location
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+
+    # Notes and preferences
+    notes = db.Column(db.Text)
+    is_favorite = db.Column(db.Boolean, default=False)
+
+    # Usage tracking
+    times_used = db.Column(db.Integer, default=0)
+    last_used = db.Column(db.DateTime)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationships
+    user = db.relationship('User', backref=db.backref('fuel_stations', lazy='dynamic'))
+
+    def increment_usage(self):
+        """Increment usage counter when station is used"""
+        self.times_used = (self.times_used or 0) + 1
+        self.last_used = datetime.utcnow()
+
+
+class Document(db.Model):
+    """Document storage for vehicle-related documents"""
+    __tablename__ = 'documents'
+
+    id = db.Column(db.Integer, primary_key=True)
+    vehicle_id = db.Column(db.Integer, db.ForeignKey('vehicles.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    title = db.Column(db.String(100), nullable=False)
+    document_type = db.Column(db.String(50), nullable=False)
+    description = db.Column(db.Text)
+
+    # File info
+    filename = db.Column(db.String(255), nullable=False)
+    original_filename = db.Column(db.String(255), nullable=False)
+    file_type = db.Column(db.String(50))
+    file_size = db.Column(db.Integer)
+
+    # Optional metadata
+    issue_date = db.Column(db.Date)
+    expiry_date = db.Column(db.Date)
+    reference_number = db.Column(db.String(100))
+
+    # Reminder for expiry
+    remind_before_expiry = db.Column(db.Boolean, default=True)
+    remind_days = db.Column(db.Integer, default=30)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    vehicle = db.relationship('Vehicle', backref=db.backref('documents', lazy='dynamic', cascade='all, delete-orphan'))
+    user = db.relationship('User', backref=db.backref('documents', lazy='dynamic'))
+
+    def is_expiring_soon(self, days=30):
+        """Check if document is expiring soon"""
+        from datetime import date, timedelta
+        if not self.expiry_date:
+            return False
+        return self.expiry_date <= date.today() + timedelta(days=days)
+
+    def is_expired(self):
+        """Check if document has expired"""
+        from datetime import date
+        if not self.expiry_date:
+            return False
+        return self.expiry_date < date.today()

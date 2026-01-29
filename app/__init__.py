@@ -75,7 +75,7 @@ def create_app(config_class=Config):
             'PRIMARY_COLOR': branding.get('primary_color', '#0284c7'),
         }
 
-    from app.routes import main, auth, vehicles, fuel, expenses, api, reminders
+    from app.routes import main, auth, vehicles, fuel, expenses, api, reminders, maintenance, documents, stations, recurring, homeassistant, calendar
     app.register_blueprint(main.bp)
     app.register_blueprint(auth.bp)
     app.register_blueprint(vehicles.bp)
@@ -83,6 +83,12 @@ def create_app(config_class=Config):
     app.register_blueprint(expenses.bp)
     app.register_blueprint(api.bp)
     app.register_blueprint(reminders.bp)
+    app.register_blueprint(maintenance.bp)
+    app.register_blueprint(documents.bp)
+    app.register_blueprint(stations.bp)
+    app.register_blueprint(recurring.bp)
+    app.register_blueprint(homeassistant.bp)
+    app.register_blueprint(calendar.bp)
 
     with app.app_context():
         db.create_all()

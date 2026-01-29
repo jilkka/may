@@ -175,3 +175,83 @@ def delete(log_id):
     db.session.commit()
     flash('Fuel log deleted successfully', 'success')
     return redirect(url_for('vehicles.view', vehicle_id=vehicle_id))
+
+
+@bp.route('/quick', methods=['GET', 'POST'])
+@login_required
+def quick():
+    """Quick entry mode - simplified single-screen fuel entry for mobile"""
+    from app.models import FuelStation
+
+    vehicles = current_user.get_all_vehicles()
+
+    if not vehicles:
+        flash('Please add a vehicle first', 'info')
+        return redirect(url_for('vehicles.new'))
+
+    # Get user's fuel stations for dropdown
+    stations = FuelStation.query.filter_by(user_id=current_user.id).order_by(
+        FuelStation.is_favorite.desc(),
+        FuelStation.times_used.desc()
+    ).limit(10).all()
+
+    if request.method == 'POST':
+        vehicle_id = int(request.form.get('vehicle_id'))
+        vehicle = Vehicle.query.get_or_404(vehicle_id)
+
+        if vehicle not in vehicles:
+            flash('Access denied', 'error')
+            return redirect(url_for('fuel.quick'))
+
+        log = FuelLog(
+            vehicle_id=vehicle_id,
+            user_id=current_user.id,
+            date=datetime.now().date(),
+            odometer=float(request.form.get('odometer')),
+            volume=float(request.form.get('volume')) if request.form.get('volume') else None,
+            total_cost=float(request.form.get('total_cost')) if request.form.get('total_cost') else None,
+            is_full_tank=request.form.get('is_full_tank') == 'on',
+            station=request.form.get('station'),
+        )
+
+        # Calculate price per unit
+        if log.volume and log.total_cost:
+            log.price_per_unit = round(log.total_cost / log.volume, 3)
+
+        # Update station usage
+        station_name = request.form.get('station')
+        if station_name:
+            station = FuelStation.query.filter_by(
+                user_id=current_user.id,
+                name=station_name
+            ).first()
+            if station:
+                station.increment_usage()
+
+        db.session.add(log)
+        db.session.commit()
+
+        flash('Fuel log added!', 'success')
+
+        # Return to quick entry or vehicle page based on preference
+        if request.form.get('add_another'):
+            return redirect(url_for('fuel.quick', vehicle_id=vehicle_id))
+        return redirect(url_for('vehicles.view', vehicle_id=vehicle_id))
+
+    # Pre-select vehicle
+    selected_vehicle_id = request.args.get('vehicle_id')
+    if not selected_vehicle_id and len(vehicles) == 1:
+        selected_vehicle_id = vehicles[0].id
+
+    # Get last odometer for selected vehicle
+    last_odometer = None
+    if selected_vehicle_id:
+        vehicle = Vehicle.query.get(selected_vehicle_id)
+        if vehicle:
+            last_odometer = vehicle.get_last_odometer()
+
+    return render_template('fuel/quick.html',
+                           vehicles=vehicles,
+                           stations=stations,
+                           selected_vehicle_id=selected_vehicle_id,
+                           last_odometer=last_odometer)
