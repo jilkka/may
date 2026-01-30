@@ -228,17 +228,32 @@
                                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ _('Manage users and permissions') }}</p>
                             </div>
 
-                            <div class="p-6">
+                            <div class="p-6 space-y-6">
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <h3 class="text-sm font-medium text-gray-900 dark:text-white">{{ _('Users') }}</h3>
                                         <p class="text-sm text-gray-500 dark:text-gray-400">{{ _('View and manage all users') }}</p>
                                     </div>
                                     <a href="{{ url_for('auth.users') }}"
-                                       class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 dark:bg-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600">
+                                       class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                         {{ _('Manage Users') }}
                                     </a>
                                 </div>
+
+                                <form method="POST" action="{{ url_for('auth.registration_settings') }}">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h3 class="text-sm font-medium text-gray-900 dark:text-white">{{ _('Allow Registration') }}</h3>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ _('Allow new users to create accounts') }}</p>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" name="registration_enabled" class="sr-only peer"
+                                                   {% if registration_enabled %}checked{% endif %}
+                                                   onchange="this.form.submit()">
+                                            <div class="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 dark:after:border-gray-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                        </label>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                         {% endif %}

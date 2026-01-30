@@ -30,7 +30,8 @@ def login():
 
         flash('Invalid username or password', 'error')
 
-    return render_template('auth/login.html')
+    registration_enabled = AppSettings.get('registration_enabled', 'true') == 'true'
+    return render_template('auth/login.html', registration_enabled=registration_enabled)
 
 
 def get_start_page_url(user):
@@ -56,6 +57,11 @@ def get_start_page_url(user):
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('main.dashboard'))
+
+    # Check if registration is enabled
+    if AppSettings.get('registration_enabled', 'true') != 'true':
+        flash('New account registration is currently disabled.', 'error')
+        return redirect(url_for('auth.login'))
 
     if request.method == 'POST':
         username = request.form.get('username')
@@ -154,6 +160,9 @@ def settings():
             'api_key': AppSettings.get('dvla_api_key'),
         }
 
+    # Get registration setting
+    registration_enabled = AppSettings.get('registration_enabled', 'true') == 'true'
+
     return render_template('auth/settings.html',
                            branding=branding,
                            smtp_settings=smtp_settings,
@@ -161,7 +170,8 @@ def settings():
                            pushover_configured=pushover_configured,
                            dvla_settings=dvla_settings,
                            app_version=APP_VERSION,
-                           github_repo=GITHUB_REPO)
+                           github_repo=GITHUB_REPO,
+                           registration_enabled=registration_enabled)
 
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'}
@@ -276,6 +286,21 @@ def dvla_settings():
 
     flash('DVLA settings updated', 'success')
     return redirect(url_for('auth.settings') + '#services-dvla')
+
+
+@bp.route('/registration-settings', methods=['POST'])
+@login_required
+def registration_settings():
+    """Update registration settings (admin only)"""
+    if not current_user.is_admin:
+        flash('Access denied', 'error')
+        return redirect(url_for('auth.settings'))
+
+    enabled = 'true' if request.form.get('registration_enabled') else 'false'
+    AppSettings.set('registration_enabled', enabled)
+
+    flash('Registration settings updated', 'success')
+    return redirect(url_for('auth.settings') + '#account')
 
 
 @bp.route('/users')

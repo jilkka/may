@@ -4,7 +4,7 @@ from pathlib import Path
 basedir = Path(__file__).parent.absolute()
 
 
-APP_VERSION = '0.2.6'
+APP_VERSION = '0.2.7'
 GITHUB_REPO = 'dannymcc/may'
 
 
