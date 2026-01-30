@@ -3,8 +3,8 @@
 
 {% block content %}
 <div class="max-w-4xl mx-auto">
-    <h1 class="text-2xl font-bold text-gray-900 mb-2">{{ _('Settings') }}</h1>
-    <p class="text-gray-500 mb-8">{{ _('Manage your preferences and account') }}</p>
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ _('Settings') }}</h1>
+    <p class="text-gray-500 dark:text-gray-400 mb-8">{{ _('Manage your preferences and account') }}</p>
 
     <div class="flex flex-col lg:flex-row gap-8">
         <!-- Sidebar Navigation -->
@@ -214,7 +214,7 @@
                                     <button type="button" onclick="toggleDarkMode()"
                                             class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 bg-gray-200 dark:bg-primary-600"
                                             role="switch">
-                                        <span class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-0 dark:translate-x-5"></span>
+                                        <span class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white dark:bg-gray-800 shadow ring-0 transition duration-200 ease-in-out translate-x-0 dark:translate-x-5"></span>
                                     </button>
                                 </div>
                             </div>
@@ -235,7 +235,7 @@
                                         <p class="text-sm text-gray-500 dark:text-gray-400">{{ _('View and manage all users') }}</p>
                                     </div>
                                     <a href="{{ url_for('auth.users') }}"
-                                       class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                       class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 dark:bg-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600">
                                         {{ _('Manage Users') }}
                                     </a>
                                 </div>
@@ -288,7 +288,7 @@
                                         <p class="text-sm text-gray-500 dark:text-gray-400">{{ _('Permanently delete your account and all data') }}</p>
                                     </div>
                                     <button type="button" disabled
-                                            class="px-4 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-white hover:bg-red-50 opacity-50 cursor-not-allowed">
+                                            class="px-4 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-white dark:bg-gray-800 hover:bg-red-50 opacity-50 cursor-not-allowed">
                                         {{ _('Delete Account') }}
                                     </button>
                                 </div>
@@ -336,7 +336,7 @@
                                 <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" name="show_quick_entry" {% if current_user.show_quick_entry %}checked{% endif %}
                                            class="sr-only peer">
-                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white dark:bg-gray-800 after:border-gray-300 dark:border-gray-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
                                 </label>
                             </div>
 
@@ -418,9 +418,9 @@
                                 </div>
                                 <form method="POST" action="{{ url_for('api.import_hammond') }}" enctype="multipart/form-data" class="flex items-center gap-2">
                                     <input type="file" name="file" accept=".db,.sqlite,.sqlite3" required
-                                           class="text-sm text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-sm file:bg-gray-100 dark:file:bg-gray-600 file:text-gray-700 dark:file:text-gray-200 hover:file:bg-gray-200 dark:hover:file:bg-gray-500">
+                                           class="text-sm text-gray-500 dark:text-gray-400 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-sm file:bg-gray-100 dark:bg-gray-600 dark:file:bg-gray-600 file:text-gray-700 dark:text-gray-300 dark:file:text-gray-200 hover:file:bg-gray-200 dark:hover:file:bg-gray-50 dark:bg-gray-7000">
                                     <button type="submit"
-                                            class="w-24 text-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                            class="w-24 text-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 dark:bg-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600">
                                         Import
                                     </button>
                                 </form>
@@ -433,9 +433,9 @@
                                 </div>
                                 <form method="POST" action="{{ url_for('api.import_clarkson') }}" enctype="multipart/form-data" class="flex items-center gap-2">
                                     <input type="file" name="file" accept=".sql" required
-                                           class="text-sm text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-sm file:bg-gray-100 dark:file:bg-gray-600 file:text-gray-700 dark:file:text-gray-200 hover:file:bg-gray-200 dark:hover:file:bg-gray-500">
+                                           class="text-sm text-gray-500 dark:text-gray-400 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-sm file:bg-gray-100 dark:bg-gray-600 dark:file:bg-gray-600 file:text-gray-700 dark:text-gray-300 dark:file:text-gray-200 hover:file:bg-gray-200 dark:hover:file:bg-gray-50 dark:bg-gray-7000">
                                     <button type="submit"
-                                            class="w-24 text-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                            class="w-24 text-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 dark:bg-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600">
                                         Import
                                     </button>
                                 </form>
@@ -448,9 +448,9 @@
                                 </div>
                                 <form method="POST" action="{{ url_for('api.import_fuelly') }}" enctype="multipart/form-data" class="flex items-center gap-2">
                                     <input type="file" name="file" accept=".csv" required
-                                           class="text-sm text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-sm file:bg-gray-100 dark:file:bg-gray-600 file:text-gray-700 dark:file:text-gray-200 hover:file:bg-gray-200 dark:hover:file:bg-gray-500">
+                                           class="text-sm text-gray-500 dark:text-gray-400 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-sm file:bg-gray-100 dark:bg-gray-600 dark:file:bg-gray-600 file:text-gray-700 dark:text-gray-300 dark:file:text-gray-200 hover:file:bg-gray-200 dark:hover:file:bg-gray-50 dark:bg-gray-7000">
                                     <button type="submit"
-                                            class="w-24 text-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                            class="w-24 text-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 dark:bg-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600">
                                         Import
                                     </button>
                                 </form>
@@ -462,7 +462,7 @@
                                     <p class="text-sm text-gray-500 dark:text-gray-400">Import from Drivvo backup files</p>
                                 </div>
                                 <button type="button" disabled
-                                        class="w-24 text-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-700 cursor-not-allowed">
+                                        class="w-24 text-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-400 dark:text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 cursor-not-allowed">
                                     Soon
                                 </button>
                             </div>
@@ -483,7 +483,7 @@
                                     <p class="text-sm text-gray-500 dark:text-gray-400">{{ _('Download all your vehicles, fuel logs, and expenses as CSV files (ZIP archive)') }}</p>
                                 </div>
                                 <a href="{{ url_for('api.export_csv') }}"
-                                   class="w-36 text-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                   class="w-36 text-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 dark:bg-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600">
                                     {{ _('Download CSV') }}
                                 </a>
                             </div>
@@ -494,7 +494,7 @@
                                     <p class="text-sm text-gray-500 dark:text-gray-400">{{ _('Download a complete backup of your data in JSON format') }}</p>
                                 </div>
                                 <a href="{{ url_for('api.export_json') }}"
-                                   class="w-36 text-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                   class="w-36 text-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 dark:bg-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600">
                                     {{ _('Download JSON') }}
                                 </a>
                             </div>
@@ -541,18 +541,18 @@
                                             </button>
                                         </div>
                                         <button type="button" onclick="copyApiKey()"
-                                                class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                                class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 dark:bg-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600">
                                             {{ _('Copy') }}
                                         </button>
                                     </div>
                                     <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">{{ _('Created') }}: {{ current_user.api_key_created_at.strftime('%B %d, %Y at %H:%M') }}</p>
                                     <div class="flex gap-3">
                                         <button type="button" onclick="regenerateApiKey()"
-                                                class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                                class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 dark:bg-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600">
                                             {{ _('Regenerate Key') }}
                                         </button>
                                         <button type="button" onclick="revokeApiKey()"
-                                                class="px-4 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-white hover:bg-red-50">
+                                                class="px-4 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-white dark:bg-gray-800 hover:bg-red-50">
                                             {{ _('Revoke Key') }}
                                         </button>
                                     </div>
@@ -576,15 +576,15 @@
                                     <h3 class="text-sm font-medium text-green-800 mb-2">{{ _('API Key Generated') }}</h3>
                                     <p class="text-xs text-green-700 mb-3">{{ _('Copy your API key now. For security, it won\'t be shown in full again.') }}</p>
                                     <div class="flex items-center gap-2">
-                                        <code id="new-api-key" class="flex-1 block bg-white border border-green-300 rounded px-3 py-2 text-sm font-mono break-all"></code>
+                                        <code id="new-api-key" class="flex-1 block bg-white dark:bg-gray-800 border border-green-300 rounded px-3 py-2 text-sm font-mono break-all"></code>
                                         <button type="button" onclick="copyNewApiKey()"
-                                                class="px-3 py-2 border border-green-300 rounded-md text-sm font-medium text-green-700 bg-white hover:bg-green-50">
+                                                class="px-3 py-2 border border-green-300 rounded-md text-sm font-medium text-green-700 bg-white dark:bg-gray-800 hover:bg-green-50">
                                             {{ _('Copy') }}
                                         </button>
                                     </div>
                                 </div>
                                 <button type="button" onclick="location.reload()"
-                                        class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                        class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 dark:bg-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600">
                                     {{ _('Done') }}
                                 </button>
                             </div>
@@ -620,7 +620,7 @@
                             {% if current_user.api_key %}
                             <span class="mt-3 inline-flex items-center px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 rounded">{{ _('Ready') }}</span>
                             {% else %}
-                            <span class="mt-3 inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400 rounded">{{ _('Requires API key') }}</span>
+                            <span class="mt-3 inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-400 dark:bg-gray-700 dark:text-gray-400 rounded">{{ _('Requires API key') }}</span>
                             {% endif %}
                         </button>
 
@@ -641,7 +641,7 @@
                             {% if current_user.api_key %}
                             <span class="mt-3 inline-flex items-center px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 rounded">{{ _('Ready') }}</span>
                             {% else %}
-                            <span class="mt-3 inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400 rounded">{{ _('Requires API key') }}</span>
+                            <span class="mt-3 inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-400 dark:bg-gray-700 dark:text-gray-400 rounded">{{ _('Requires API key') }}</span>
                             {% endif %}
                         </button>
 
@@ -664,7 +664,7 @@
                             {% if dvla_settings.api_key %}
                             <span class="mt-3 inline-flex items-center px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 rounded">{{ _('Configured') }}</span>
                             {% else %}
-                            <span class="mt-3 inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400 rounded">{{ _('Not configured') }}</span>
+                            <span class="mt-3 inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-400 dark:bg-gray-700 dark:text-gray-400 rounded">{{ _('Not configured') }}</span>
                             {% endif %}
                         </button>
                         {% endif %}
@@ -674,7 +674,7 @@
                 <!-- Calendar Integration Detail -->
                 <div id="integration-calendar" class="integration-detail hidden">
                     <div class="mb-6">
-                        <button type="button" onclick="hideIntegration()" class="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 mb-4">
+                        <button type="button" onclick="hideIntegration()" class="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 dark:text-gray-400 dark:hover:text-gray-200 mb-4">
                             <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                             </svg>
@@ -700,7 +700,7 @@
                         <div class="p-6">
                             {% if current_user.api_key %}
                             <div class="space-y-4">
-                                <p class="text-sm text-gray-600 dark:text-gray-300">{{ _('Add this calendar to Apple Calendar, Google Calendar, Outlook, or any other calendar app that supports iCal subscriptions.') }}</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300">{{ _('Add this calendar to Apple Calendar, Google Calendar, Outlook, or any other calendar app that supports iCal subscriptions.') }}</p>
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ _('Webcal URL') }}</label>
@@ -708,9 +708,9 @@
                                     <div class="flex items-center gap-2">
                                         <input type="text" readonly id="webcal-url"
                                                value="webcal://{{ request.host }}/api/calendar/feed?token={{ current_user.api_key }}"
-                                               class="flex-1 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-3 py-2 text-sm font-mono text-gray-600 dark:text-gray-300">
+                                               class="flex-1 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-3 py-2 text-sm font-mono text-gray-600 dark:text-gray-400 dark:text-gray-300">
                                         <button type="button" onclick="copyToClipboard('webcal-url')"
-                                                class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                                class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 dark:bg-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600">
                                             {{ _('Copy') }}
                                         </button>
                                     </div>
@@ -722,9 +722,9 @@
                                     <div class="flex items-center gap-2">
                                         <input type="text" readonly id="https-calendar-url"
                                                value="{{ request.url_root.rstrip('/') }}/api/calendar/feed?token={{ current_user.api_key }}"
-                                               class="flex-1 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-3 py-2 text-sm font-mono text-gray-600 dark:text-gray-300">
+                                               class="flex-1 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-3 py-2 text-sm font-mono text-gray-600 dark:text-gray-400 dark:text-gray-300">
                                         <button type="button" onclick="copyToClipboard('https-calendar-url')"
-                                                class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                                class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 dark:bg-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600">
                                             {{ _('Copy') }}
                                         </button>
                                     </div>
@@ -732,7 +732,7 @@
 
                                 <div class="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                                     <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-2">{{ _('What\'s included in the calendar?') }}</h4>
-                                    <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                                    <ul class="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300 space-y-1">
                                         <li class="flex items-center"><svg class="w-4 h-4 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>{{ _('Maintenance schedules') }}</li>
                                         <li class="flex items-center"><svg class="w-4 h-4 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>{{ _('Recurring expense due dates') }}</li>
                                         <li class="flex items-center"><svg class="w-4 h-4 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>{{ _('Document expiry dates') }}</li>
@@ -760,7 +760,7 @@
                 <!-- Home Assistant Integration Detail -->
                 <div id="integration-homeassistant" class="integration-detail hidden">
                     <div class="mb-6">
-                        <button type="button" onclick="hideIntegration()" class="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 mb-4">
+                        <button type="button" onclick="hideIntegration()" class="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 dark:text-gray-400 dark:hover:text-gray-200 mb-4">
                             <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                             </svg>
@@ -786,7 +786,7 @@
                         <div class="p-6">
                             {% if current_user.api_key %}
                             <div class="space-y-6">
-                                <p class="text-sm text-gray-600 dark:text-gray-300">{{ _('Add the following configuration to your Home Assistant configuration.yaml to create vehicle sensors.') }}</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300">{{ _('Add the following configuration to your Home Assistant configuration.yaml to create vehicle sensors.') }}</p>
 
                                 <div>
                                     <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-2">{{ _('REST Sensor Configuration') }}</h4>
@@ -812,23 +812,23 @@
                                     <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">{{ _('Available API Endpoints') }}</h4>
                                     <div class="space-y-2 text-sm">
                                         <div class="flex justify-between">
-                                            <code class="text-gray-600 dark:text-gray-300">/api/ha/status</code>
+                                            <code class="text-gray-600 dark:text-gray-400 dark:text-gray-300">/api/ha/status</code>
                                             <span class="text-gray-500 dark:text-gray-400">{{ _('API health check') }}</span>
                                         </div>
                                         <div class="flex justify-between">
-                                            <code class="text-gray-600 dark:text-gray-300">/api/ha/vehicles</code>
+                                            <code class="text-gray-600 dark:text-gray-400 dark:text-gray-300">/api/ha/vehicles</code>
                                             <span class="text-gray-500 dark:text-gray-400">{{ _('List all vehicles') }}</span>
                                         </div>
                                         <div class="flex justify-between">
-                                            <code class="text-gray-600 dark:text-gray-300">/api/ha/vehicles/{id}/stats</code>
+                                            <code class="text-gray-600 dark:text-gray-400 dark:text-gray-300">/api/ha/vehicles/{id}/stats</code>
                                             <span class="text-gray-500 dark:text-gray-400">{{ _('Vehicle statistics') }}</span>
                                         </div>
                                         <div class="flex justify-between">
-                                            <code class="text-gray-600 dark:text-gray-300">/api/ha/alerts</code>
+                                            <code class="text-gray-600 dark:text-gray-400 dark:text-gray-300">/api/ha/alerts</code>
                                             <span class="text-gray-500 dark:text-gray-400">{{ _('Upcoming reminders') }}</span>
                                         </div>
                                         <div class="flex justify-between">
-                                            <code class="text-gray-600 dark:text-gray-300">/api/ha/summary</code>
+                                            <code class="text-gray-600 dark:text-gray-400 dark:text-gray-300">/api/ha/summary</code>
                                             <span class="text-gray-500 dark:text-gray-400">{{ _('Combined summary') }}</span>
                                         </div>
                                     </div>
@@ -855,7 +855,7 @@
                 {% if current_user.is_admin %}
                 <div id="integration-dvla" class="integration-detail hidden">
                     <div class="mb-6">
-                        <button type="button" onclick="hideIntegration()" class="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 mb-4">
+                        <button type="button" onclick="hideIntegration()" class="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 dark:text-gray-400 dark:hover:text-gray-200 mb-4">
                             <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                             </svg>
@@ -880,7 +880,7 @@
 
                         <div class="p-6">
                             <div class="space-y-4">
-                                <p class="text-sm text-gray-600 dark:text-gray-300">
+                                <p class="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-300">
                                     {{ _('The DVLA Vehicle Enquiry Service allows you to look up MOT status, tax status, and vehicle details for UK registered vehicles. This enables automatic population of vehicle information when adding new vehicles.') }}
                                 </p>
 
@@ -903,7 +903,7 @@
                                                    placeholder="Enter your DVLA VES API key"
                                                    class="flex-1 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
                                             <button type="button" onclick="testDvlaKey()"
-                                                    class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                                    class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 dark:bg-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600">
                                                 {{ _('Test') }}
                                             </button>
                                         </div>
@@ -946,14 +946,14 @@
                                         <input type="checkbox" name="email_reminders" value="true"
                                                {% if current_user.email_reminders %}checked{% endif %}
                                                class="sr-only peer">
-                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white dark:bg-gray-800 after:border-gray-300 dark:border-gray-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
                                     </label>
                                 </div>
 
                                 <!-- Default Reminder Days -->
                                 <div>
                                     <label for="reminder_days_before" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ _('Default Reminder Lead Time') }}</label>
-                                    <p class="text-sm text-gray-500 mb-2">{{ _('How many days before the due date should you be notified?') }}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">{{ _('How many days before the due date should you be notified?') }}</p>
                                     <select name="reminder_days_before" id="reminder_days_before"
                                             class="block w-full sm:w-48 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
                                         <option value="0" {% if current_user.reminder_days_before == 0 %}selected{% endif %}>{{ _('On the due date') }}</option>
@@ -968,7 +968,7 @@
                                 <!-- Notification Method -->
                                 <div>
                                     <label for="notification_method" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ _('Notification Method') }}</label>
-                                    <p class="text-sm text-gray-500 mb-2">{{ _('Choose how you want to receive notifications') }}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">{{ _('Choose how you want to receive notifications') }}</p>
                                     <select name="notification_method" id="notification_method"
                                             onchange="toggleNotificationFields()"
                                             class="block w-full sm:w-64 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
@@ -1051,7 +1051,7 @@
                                 <!-- Test Notification Button -->
                                 <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
                                     <button type="button" onclick="sendTestNotification()"
-                                            class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 dark:bg-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600">
                                         <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                                         </svg>
@@ -1088,7 +1088,7 @@
                         <div class="p-6">
                             <form method="POST" action="{{ url_for('auth.smtp_settings') }}" class="space-y-6">
                                 <!-- Email (SMTP) Settings -->
-                                <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                                     <div class="flex items-center justify-between mb-4">
                                         <div class="flex items-center">
                                             <svg class="h-5 w-5 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1100,7 +1100,7 @@
                                             <input type="checkbox" name="smtp_enabled" value="true"
                                                    {% if smtp_settings.enabled != 'false' %}checked{% endif %}
                                                    class="sr-only peer">
-                                            <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary-600"></div>
+                                            <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white dark:bg-gray-800 after:border-gray-300 dark:border-gray-600 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary-600"></div>
                                         </label>
                                     </div>
 
@@ -1153,17 +1153,17 @@
                                         <label class="flex items-center">
                                             <input type="checkbox" name="smtp_tls" value="true"
                                                    {% if smtp_settings.tls != 'false' %}checked{% endif %}
-                                                   class="rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                                                   class="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500">
                                             <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ _('Use TLS') }}</span>
                                         </label>
                                         <label class="flex items-center">
                                             <input type="checkbox" name="smtp_ssl" value="true"
                                                    {% if smtp_settings.ssl == 'true' %}checked{% endif %}
-                                                   class="rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                                                   class="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500">
                                             <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ _('Use SSL') }}</span>
                                         </label>
                                         <button type="button" onclick="testSmtpSettings()"
-                                                class="ml-auto inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                                class="ml-auto inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 dark:bg-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600">
                                             {{ _('Test') }}
                                         </button>
                                     </div>
@@ -1171,7 +1171,7 @@
                                 </div>
 
                                 <!-- Pushover Settings -->
-                                <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                                     <div class="flex items-center justify-between mb-4">
                                         <div class="flex items-center">
                                             <svg class="h-5 w-5 text-red-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1183,10 +1183,10 @@
                                             <input type="checkbox" name="pushover_enabled" value="true"
                                                    {% if smtp_settings.pushover_enabled == 'true' %}checked{% endif %}
                                                    class="sr-only peer">
-                                            <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary-600"></div>
+                                            <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white dark:bg-gray-800 after:border-gray-300 dark:border-gray-600 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary-600"></div>
                                         </label>
                                     </div>
-                                    <p class="text-sm text-gray-500 mb-3">
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">
                                         <a href="https://pushover.net" target="_blank" class="text-primary-600 hover:underline">Pushover</a>
                                         {{ _('sends push notifications to iOS and Android devices.') }}
                                     </p>
@@ -1201,7 +1201,7 @@
                                 </div>
 
                                 <!-- ntfy Info -->
-                                <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                                     <div class="flex items-center mb-2">
                                         <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
@@ -1216,7 +1216,7 @@
                                 </div>
 
                                 <!-- Webhook Info -->
-                                <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                                     <div class="flex items-center mb-2">
                                         <svg class="h-5 w-5 text-purple-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
@@ -1292,7 +1292,7 @@
                                     <div class="mt-1 flex items-center gap-3">
                                         <input type="color" name="primary_color" id="primary_color"
                                                value="{{ branding.primary_color or '#0284c7' }}"
-                                               class="h-10 w-14 rounded border border-gray-300 cursor-pointer">
+                                               class="h-10 w-14 rounded border border-gray-300 dark:border-gray-600 cursor-pointer">
                                         <input type="text" id="primary_color_hex" readonly
                                                value="{{ branding.primary_color or '#0284c7' }}"
                                                class="flex-1 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-white px-3 py-2 text-sm font-mono">
@@ -1309,7 +1309,7 @@
                                     </div>
                                     {% endif %}
                                     <input type="file" name="logo" accept="image/*"
-                                           class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100">
+                                           class="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100">
                                 </div>
                             </div>
                         </div>
@@ -1341,7 +1341,7 @@
                                 <p class="text-2xl font-bold text-primary-600">v{{ app_version }}</p>
                             </div>
                             <a href="https://github.com/{{ github_repo }}" target="_blank" rel="noopener"
-                               class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-300">
+                               class="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300">
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                     <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
                                 </svg>
@@ -1354,10 +1354,10 @@
                             <div class="flex items-center justify-between">
                                 <div>
                                     <h3 class="text-sm font-medium text-gray-900 dark:text-white">{{ _('Check for Updates') }}</h3>
-                                    <p class="text-sm text-gray-500" id="update-status">{{ _('Click to check for newer versions') }}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400" id="update-status">{{ _('Click to check for newer versions') }}</p>
                                 </div>
                                 <button type="button" onclick="checkForUpdates()"
-                                        class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                                        class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                                     <svg class="w-4 h-4 mr-2" id="update-spinner" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                                     </svg>
@@ -1400,32 +1400,32 @@
 
                         <!-- Links -->
                         <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                            <h3 class="text-sm font-medium text-gray-900 mb-3">{{ _('Resources') }}</h3>
+                            <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-3">{{ _('Resources') }}</h3>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <a href="https://github.com/{{ github_repo }}" target="_blank" rel="noopener"
-                                   class="flex items-center gap-2 p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                    <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                                   class="flex items-center gap-2 p-3 rounded-lg border border-gray-200 dark:border-gray-700 dark:border-gray-600 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-700 transition-colors">
+                                    <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="currentColor" viewBox="0 0 24 24">
                                         <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
                                     </svg>
                                     <span class="text-sm text-gray-700 dark:text-gray-300">{{ _('Source Code') }}</span>
                                 </a>
                                 <a href="https://github.com/{{ github_repo }}/issues" target="_blank" rel="noopener"
-                                   class="flex items-center gap-2 p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                    <svg class="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                   class="flex items-center gap-2 p-3 rounded-lg border border-gray-200 dark:border-gray-700 dark:border-gray-600 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-700 transition-colors">
+                                    <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
                                     <span class="text-sm text-gray-700 dark:text-gray-300">{{ _('Report an Issue') }}</span>
                                 </a>
                                 <a href="https://github.com/{{ github_repo }}/releases" target="_blank" rel="noopener"
-                                   class="flex items-center gap-2 p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                    <svg class="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                   class="flex items-center gap-2 p-3 rounded-lg border border-gray-200 dark:border-gray-700 dark:border-gray-600 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-700 transition-colors">
+                                    <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                                     </svg>
                                     <span class="text-sm text-gray-700 dark:text-gray-300">{{ _('All Releases') }}</span>
                                 </a>
                                 <a href="https://github.com/{{ github_repo }}#readme" target="_blank" rel="noopener"
-                                   class="flex items-center gap-2 p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                    <svg class="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                   class="flex items-center gap-2 p-3 rounded-lg border border-gray-200 dark:border-gray-700 dark:border-gray-600 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-700 transition-colors">
+                                    <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                                     </svg>
                                     <span class="text-sm text-gray-700 dark:text-gray-300">{{ _('Documentation') }}</span>

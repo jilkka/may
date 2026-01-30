@@ -20,7 +20,7 @@
 <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
     <ul class="divide-y divide-gray-200 dark:divide-gray-700">
         {% for station in stations %}
-        <li class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700">
+        <li class="p-4 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-700">
             <div class="flex items-center justify-between">
                 <div class="flex items-center min-w-0">
                     <button onclick="toggleFavorite({{ station.id }})" class="mr-3 focus:outline-none" id="fav-btn-{{ station.id }}">
@@ -43,11 +43,11 @@
                     </div>
                 </div>
                 <div class="ml-4 flex items-center gap-4">
-                    <span class="text-xs text-gray-400 dark:text-gray-500">
+                    <span class="text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400">
                         {{ _('Used') }} {{ station.times_used or 0 }}x
                     </span>
                     <a href="{{ url_for('stations.edit', station_id=station.id) }}"
-                       class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                       class="text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300">
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                         </svg>

@@ -4,27 +4,27 @@
 {% block content %}
 <div class="max-w-2xl mx-auto">
     <div class="mb-6">
-        <a href="{{ url_for('vehicles.index') }}" class="text-sm text-gray-500 hover:text-gray-700">&larr; Back to vehicles</a>
-        <h1 class="text-2xl font-bold text-gray-900 mt-2">{% if vehicle %}Edit Vehicle{% else %}Add New Vehicle{% endif %}</h1>
+        <a href="{{ url_for('vehicles.index') }}" class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300">&larr; Back to vehicles</a>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mt-2">{% if vehicle %}Edit Vehicle{% else %}Add New Vehicle{% endif %}</h1>
     </div>
 
     <form method="POST" enctype="multipart/form-data" class="space-y-6">
-        <div class="bg-white shadow rounded-lg p-6">
-            <h2 class="text-lg font-medium text-gray-900 mb-4">Basic Information</h2>
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Basic Information</h2>
 
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div class="sm:col-span-2">
-                    <label for="name" class="block text-sm font-medium text-gray-700">Name *</label>
+                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name *</label>
                     <input type="text" name="name" id="name" required
                            value="{{ vehicle.name if vehicle else '' }}"
                            placeholder="e.g., My Daily Driver"
-                           class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
+                           class="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
                 </div>
 
                 <div>
-                    <label for="vehicle_type" class="block text-sm font-medium text-gray-700">Type *</label>
+                    <label for="vehicle_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Type *</label>
                     <select name="vehicle_type" id="vehicle_type" required
-                            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
+                            class="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
                         {% for value, label in vehicle_types %}
                         <option value="{{ value }}" {% if vehicle and vehicle.vehicle_type == value %}selected{% endif %}>{{ label }}</option>
                         {% endfor %}
@@ -32,9 +32,9 @@
                 </div>
 
                 <div>
-                    <label for="fuel_type" class="block text-sm font-medium text-gray-700">Fuel Type</label>
+                    <label for="fuel_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Fuel Type</label>
                     <select name="fuel_type" id="fuel_type"
-                            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
+                            class="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
                         {% for value, label in fuel_types %}
                         <option value="{{ value }}" {% if vehicle and vehicle.fuel_type == value %}selected{% endif %}>{{ label }}</option>
                         {% endfor %}
@@ -42,67 +42,67 @@
                 </div>
 
                 <div>
-                    <label for="make" class="block text-sm font-medium text-gray-700">Make</label>
+                    <label for="make" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Make</label>
                     <input type="text" name="make" id="make"
                            value="{{ vehicle.make if vehicle else '' }}"
                            placeholder="e.g., Toyota"
-                           class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
+                           class="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
                 </div>
 
                 <div>
-                    <label for="model" class="block text-sm font-medium text-gray-700">Model</label>
+                    <label for="model" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Model</label>
                     <input type="text" name="model" id="model"
                            value="{{ vehicle.model if vehicle else '' }}"
                            placeholder="e.g., Corolla"
-                           class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
+                           class="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
                 </div>
 
                 <div>
-                    <label for="year" class="block text-sm font-medium text-gray-700">Year</label>
+                    <label for="year" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Year</label>
                     <input type="number" name="year" id="year"
                            value="{{ vehicle.year if vehicle else '' }}"
                            min="1900" max="2100"
                            placeholder="e.g., 2020"
-                           class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
+                           class="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
                 </div>
 
                 <div>
-                    <label for="tank_capacity" class="block text-sm font-medium text-gray-700">Tank Capacity (L)</label>
+                    <label for="tank_capacity" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tank Capacity (L)</label>
                     <input type="number" name="tank_capacity" id="tank_capacity" step="0.1"
                            value="{{ vehicle.tank_capacity if vehicle else '' }}"
                            placeholder="e.g., 50"
-                           class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
+                           class="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
                 </div>
             </div>
         </div>
 
-        <div class="bg-white shadow rounded-lg p-6">
-            <h2 class="text-lg font-medium text-gray-900 mb-4">Identification</h2>
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Identification</h2>
 
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
-                    <label for="registration" class="block text-sm font-medium text-gray-700">Registration / License Plate</label>
+                    <label for="registration" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Registration / License Plate</label>
                     <input type="text" name="registration" id="registration"
                            value="{{ vehicle.registration if vehicle else '' }}"
                            placeholder="e.g., ABC 123"
-                           class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
+                           class="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
                 </div>
 
                 <div>
-                    <label for="vin" class="block text-sm font-medium text-gray-700">VIN</label>
+                    <label for="vin" class="block text-sm font-medium text-gray-700 dark:text-gray-300">VIN</label>
                     <input type="text" name="vin" id="vin"
                            value="{{ vehicle.vin if vehicle else '' }}"
                            placeholder="Vehicle Identification Number"
-                           class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
+                           class="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
                 </div>
             </div>
         </div>
 
-        <div class="bg-white shadow rounded-lg p-6">
-            <h2 class="text-lg font-medium text-gray-900 mb-4">Photo</h2>
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Photo</h2>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700">Vehicle Image</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Vehicle Image</label>
                 {% if vehicle and vehicle.image_filename %}
                 <div class="mt-2 mb-4">
                     <img src="{{ url_for('api.uploaded_file', filename=vehicle.image_filename) }}"
@@ -111,30 +111,30 @@
                 </div>
                 {% endif %}
                 <input type="file" name="image" accept="image/*"
-                       class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100">
+                       class="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100">
             </div>
         </div>
 
-        <div class="bg-white shadow rounded-lg p-6">
-            <h2 class="text-lg font-medium text-gray-900 mb-4">Specifications</h2>
-            <p class="text-sm text-gray-500 mb-4">Add technical details like tire sizes, oil type, wiper sizes, etc.</p>
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Specifications</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Add technical details like tire sizes, oil type, wiper sizes, etc.</p>
 
             <div id="specs-container" class="space-y-3">
                 {% if specs %}
                     {% for spec in specs %}
                     <div class="spec-row flex items-center gap-3">
                         <select name="spec_type[]" onchange="handleSpecTypeChange(this)"
-                                class="w-40 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
+                                class="w-40 rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
                             {% for value, label in spec_types %}
                             <option value="{{ value }}" {% if spec.spec_type == value %}selected{% endif %}>{{ label }}</option>
                             {% endfor %}
                         </select>
                         <input type="text" name="spec_label[]" value="{{ spec.label }}"
                                placeholder="Custom label"
-                               class="spec-label w-32 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 {% if spec.spec_type != 'custom' %}hidden{% endif %}">
+                               class="spec-label w-32 rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 {% if spec.spec_type != 'custom' %}hidden{% endif %}">
                         <input type="text" name="spec_value[]" value="{{ spec.value }}"
                                placeholder="Value"
-                               class="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
+                               class="flex-1 rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
                         <button type="button" onclick="removeSpecRow(this)"
                                 class="p-2 text-gray-400 hover:text-red-500">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -147,7 +147,7 @@
             </div>
 
             <button type="button" onclick="addSpecRow()"
-                    class="mt-4 inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                    class="mt-4 inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:bg-gray-700">
                 <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                 </svg>
@@ -155,32 +155,32 @@
             </button>
         </div>
 
-        <div class="bg-white shadow rounded-lg p-6">
-            <h2 class="text-lg font-medium text-gray-900 mb-4">Notes</h2>
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Notes</h2>
 
             <div>
-                <label for="notes" class="block text-sm font-medium text-gray-700">General Notes</label>
+                <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300">General Notes</label>
                 <textarea name="notes" id="notes" rows="4"
                           placeholder="Any additional notes about this vehicle..."
-                          class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">{{ vehicle.notes if vehicle and vehicle.notes else '' }}</textarea>
+                          class="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">{{ vehicle.notes if vehicle and vehicle.notes else '' }}</textarea>
             </div>
         </div>
 
         {% if vehicle %}
-        <div class="bg-white shadow rounded-lg p-6">
-            <h2 class="text-lg font-medium text-gray-900 mb-4">Status</h2>
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Status</h2>
             <div class="flex items-center">
                 <input type="checkbox" name="is_active" id="is_active"
                        {% if vehicle.is_active %}checked{% endif %}
-                       class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500">
-                <label for="is_active" class="ml-2 block text-sm text-gray-700">Active (show in lists and calculations)</label>
+                       class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500">
+                <label for="is_active" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Active (show in lists and calculations)</label>
             </div>
         </div>
         {% endif %}
 
         <div class="flex justify-end space-x-3">
             <a href="{{ url_for('vehicles.index') }}"
-               class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+               class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:bg-gray-700">
                 Cancel
             </a>
             <button type="submit"
@@ -207,15 +207,15 @@ function addSpecRow() {
 
     row.innerHTML = `
         <select name="spec_type[]" onchange="handleSpecTypeChange(this)"
-                class="w-40 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
+                class="w-40 rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
             ${options}
         </select>
         <input type="text" name="spec_label[]" value=""
                placeholder="Custom label"
-               class="spec-label w-32 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 hidden">
+               class="spec-label w-32 rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 hidden">
         <input type="text" name="spec_value[]" value=""
                placeholder="Value"
-               class="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
+               class="flex-1 rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500">
         <button type="button" onclick="removeSpecRow(this)"
                 class="p-2 text-gray-400 hover:text-red-500">
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

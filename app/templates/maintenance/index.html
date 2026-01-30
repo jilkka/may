@@ -23,7 +23,7 @@
         {% set current_odo = vehicle_odometers.get(schedule.vehicle_id, 0) %}
         {% set is_due = schedule.is_due(current_odo) %}
         {% set is_due_soon = schedule.is_due_soon(current_odo) %}
-        <li class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 {% if is_due %}bg-red-50 dark:bg-red-900/20{% elif is_due_soon %}bg-amber-50 dark:bg-amber-900/20{% endif %}">
+        <li class="p-4 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-700 {% if is_due %}bg-red-50 dark:bg-red-900/20{% elif is_due_soon %}bg-amber-50 dark:bg-amber-900/20{% endif %}">
             <div class="flex items-center justify-between">
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2">
@@ -65,7 +65,7 @@
                     </p>
                     {% endif %}
                     {% if schedule.estimated_cost %}
-                    <p class="text-xs text-gray-400 dark:text-gray-500">
+                    <p class="text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400">
                         ~{{ "%.2f"|format(schedule.estimated_cost) }} {{ current_user.currency }}
                     </p>
                     {% endif %}
@@ -79,7 +79,7 @@
                         </svg>
                     </button>
                     <a href="{{ url_for('maintenance.edit', schedule_id=schedule.id) }}"
-                       class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                       class="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300"
                        title="{{ _('Edit') }}">
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -111,7 +111,7 @@
 {% endif %}
 
 <!-- Complete Modal -->
-<div id="complete-modal" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+<div id="complete-modal" class="hidden fixed inset-0 bg-gray-50 dark:bg-gray-7000 bg-opacity-75 flex items-center justify-center z-50">
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4">
         <form id="complete-form" method="POST">
             <div class="p-6">
@@ -125,7 +125,7 @@
                     </div>
                     <div class="flex items-center">
                         <input type="checkbox" name="create_expense" id="create_expense" checked
-                               class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                               class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded">
                         <label for="create_expense" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                             {{ _('Create expense entry') }}
                         </label>
@@ -147,7 +147,7 @@
             </div>
             <div class="bg-gray-50 dark:bg-gray-700 px-6 py-3 flex justify-end gap-3 rounded-b-lg">
                 <button type="button" onclick="hideCompleteModal()"
-                        class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600">
                     {{ _('Cancel') }}
                 </button>
                 <button type="submit"

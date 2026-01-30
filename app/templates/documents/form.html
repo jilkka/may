@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="mb-6">
-    <a href="{{ url_for('documents.index') }}" class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">&larr; {{ _('Back to Documents') }}</a>
+    <a href="{{ url_for('documents.index') }}" class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 dark:text-gray-400 dark:hover:text-gray-300">&larr; {{ _('Back to Documents') }}</a>
 </div>
 
 <div class="max-w-lg mx-auto">
@@ -96,7 +96,7 @@
             <div class="flex items-center">
                 <input type="checkbox" name="remind_before_expiry" id="remind_before_expiry"
                        {% if not document or document.remind_before_expiry %}checked{% endif %}
-                       class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                       class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded">
                 <label for="remind_before_expiry" class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ _('Remind me before expiry') }}</label>
             </div>
 
@@ -120,7 +120,7 @@
                 {% endif %}
                 <div class="flex gap-3">
                     <a href="{{ url_for('documents.index') }}"
-                       class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                       class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 dark:bg-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600">
                         {{ _('Cancel') }}
                     </a>
                     <button type="submit"

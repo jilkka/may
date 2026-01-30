@@ -40,7 +40,7 @@
         </div>
         <ul class="divide-y divide-gray-200 dark:divide-gray-700">
             {% for doc in type_docs %}
-            <li class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 {% if doc.is_expired() %}bg-red-50 dark:bg-red-900/20{% elif doc.is_expiring_soon() %}bg-amber-50 dark:bg-amber-900/20{% endif %}">
+            <li class="p-4 hover:bg-gray-50 dark:bg-gray-700 dark:hover:bg-gray-700 {% if doc.is_expired() %}bg-red-50 dark:bg-red-900/20{% elif doc.is_expiring_soon() %}bg-amber-50 dark:bg-amber-900/20{% endif %}">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center min-w-0">
                         <div class="flex-shrink-0">
@@ -78,7 +78,7 @@
                         </div>
                         {% endif %}
                         <a href="{{ url_for('documents.download', document_id=doc.id) }}"
-                           class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                           class="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300"
                            title="{{ _('Download') }}">
                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
