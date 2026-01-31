@@ -11,7 +11,24 @@ bp = Blueprint('main', __name__)
 @bp.route('/')
 def index():
     if current_user.is_authenticated:
-        return redirect(url_for('main.dashboard'))
+        # Redirect to user's configured start page
+        start_page = current_user.start_page or 'dashboard'
+        page_routes = {
+            'dashboard': 'main.dashboard',
+            'vehicles': 'vehicles.index',
+            'fuel': 'fuel.index',
+            'fuel_quick': 'fuel.quick',
+            'expenses': 'expenses.index',
+            'reminders': 'reminders.index',
+            'maintenance': 'maintenance.index',
+            'recurring': 'recurring.index',
+            'documents': 'documents.index',
+            'stations': 'stations.index',
+            'trips': 'trips.index',
+            'charging': 'charging.index',
+        }
+        route = page_routes.get(start_page, 'main.dashboard')
+        return redirect(url_for(route))
     return redirect(url_for('auth.login'))
 
 
