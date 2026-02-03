@@ -54,7 +54,16 @@ def _run_schema_migrations(app):
             ('tessie_battery_range', 'FLOAT'),
             ('tessie_last_updated', 'DATETIME'),
         ],
+        'charging_sessions': [
+            ('tessie_charge_id', 'VARCHAR(50)'),
+        ],
     }
+
+    # Define unique indexes to create after adding columns
+    # SQLite doesn't support adding UNIQUE columns directly via ALTER TABLE
+    unique_indexes = [
+        ('charging_sessions', 'tessie_charge_id', 'ix_charging_sessions_tessie_charge_id'),
+    ]
 
     with db.engine.connect() as conn:
         inspector = inspect(db.engine)
@@ -75,6 +84,19 @@ def _run_schema_migrations(app):
                         app.logger.info(f'Added column {col_name} to {table_name}')
                     except Exception as e:
                         app.logger.warning(f'Could not add column {col_name} to {table_name}: {e}')
+
+        # Create unique indexes
+        for table_name, col_name, index_name in unique_indexes:
+            if table_name not in inspector.get_table_names():
+                continue
+            # Check if index already exists
+            existing_indexes = [idx['name'] for idx in inspector.get_indexes(table_name)]
+            if index_name not in existing_indexes:
+                try:
+                    conn.execute(text(f'CREATE UNIQUE INDEX {index_name} ON {table_name} ({col_name})'))
+                    app.logger.info(f'Created unique index {index_name} on {table_name}.{col_name}')
+                except Exception as e:
+                    app.logger.warning(f'Could not create index {index_name}: {e}')
 
         conn.commit()
 

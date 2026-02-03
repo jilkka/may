@@ -178,3 +178,101 @@ class TessieService:
 
         except requests.exceptions.RequestException as e:
             return False, f"Connection error: {str(e)}"
+
+    @classmethod
+    def get_charges(cls, vin, from_timestamp=None, to_timestamp=None, limit=100):
+        """
+        Get charging history from Tessie API
+
+        Args:
+            vin: Tesla vehicle VIN
+            from_timestamp: Unix timestamp to start from (optional)
+            to_timestamp: Unix timestamp to end at (optional)
+            limit: Maximum number of results (default 100)
+
+        Returns:
+            tuple: (success: bool, list of charges or error: str)
+        """
+        api_token = cls.get_api_token()
+        if not api_token:
+            return False, "Tessie API token not configured"
+
+        headers = {
+            "Authorization": f"Bearer {api_token}",
+            "Accept": "application/json"
+        }
+
+        params = {
+            "distance_format": "mi",
+            "limit": limit
+        }
+        if from_timestamp:
+            params["from"] = from_timestamp
+        if to_timestamp:
+            params["to"] = to_timestamp
+
+        try:
+            response = requests.get(
+                f"{cls.BASE_URL}/{vin}/charges",
+                headers=headers,
+                params=params,
+                timeout=30
+            )
+
+            if response.status_code == 200:
+                data = response.json()
+                charges = []
+                for c in data.get('results', []):
+                    charges.append(cls._parse_charge(c))
+                return True, charges
+            elif response.status_code == 401:
+                return False, "Invalid API token"
+            elif response.status_code == 404:
+                return False, "Vehicle not found"
+            else:
+                return False, f"API error: {response.status_code}"
+
+        except requests.exceptions.Timeout:
+            return False, "Request timed out"
+        except requests.exceptions.RequestException as e:
+            return False, f"Connection error: {str(e)}"
+
+    @classmethod
+    def _parse_charge(cls, data):
+        """Parse a charge record from Tessie API"""
+        # Parse timestamps - can be Unix timestamp (int) or ISO string
+        started_at = data.get('started_at')
+        ended_at = data.get('ended_at')
+
+        def parse_timestamp(ts):
+            if ts is None:
+                return None
+            if isinstance(ts, int):
+                return datetime.utcfromtimestamp(ts)
+            if isinstance(ts, str):
+                return datetime.fromisoformat(ts.replace('Z', '+00:00'))
+            return None
+
+        start_dt = parse_timestamp(started_at)
+        end_dt = parse_timestamp(ended_at)
+
+        # Odometer is in miles, convert to km for storage
+        odometer_miles = data.get('odometer', 0)
+        odometer_km = odometer_miles * 1.60934 if odometer_miles else None
+
+        return {
+            'tessie_id': data.get('id'),
+            'date': start_dt.date() if start_dt else None,
+            'start_time': start_dt.time() if start_dt else None,
+            'end_time': end_dt.time() if end_dt else None,
+            'location': data.get('location'),
+            'is_supercharger': data.get('is_supercharger', False),
+            'odometer_miles': odometer_miles,
+            'odometer_km': odometer_km,
+            'kwh_added': data.get('energy_added'),
+            'start_soc': data.get('starting_battery'),
+            'end_soc': data.get('ending_battery'),
+            'cost': data.get('cost'),
+            'latitude': data.get('latitude'),
+            'longitude': data.get('longitude'),
+        }

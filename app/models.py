@@ -943,6 +943,9 @@ class ChargingSession(db.Model):
     notes = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    # Tessie integration - track imported charges
+    tessie_charge_id = db.Column(db.String(50), unique=True, nullable=True)
+
     # Relationships
     user = db.relationship('User', backref=db.backref('charging_sessions', lazy='dynamic'))
 

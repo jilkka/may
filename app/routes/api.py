@@ -16,6 +16,7 @@ from app.models import (
     Reminder, MaintenanceSchedule, RecurringExpense, FuelStation,
     Document, Trip, ChargingSession, VehiclePart, FuelPriceHistory, Attachment
 )
+from app.services.tessie import TessieService
 from config import APP_VERSION
 
 bp = Blueprint('api', __name__, url_prefix='/api')
@@ -975,6 +976,80 @@ def refresh_vehicle_tessie(vehicle_id):
         })
     else:
         return jsonify({'success': False, 'error': result}), 400
+
+
+@bp.route('/vehicles/<int:vehicle_id>/tessie-import-charges', methods=['POST'])
+@login_required
+def import_tessie_charges(vehicle_id):
+    """
+    Import charging history from Tessie for a vehicle
+
+    Creates ChargingSession records for charges not already imported.
+    """
+    from app.models import ChargingSession
+
+    vehicle = Vehicle.query.get_or_404(vehicle_id)
+
+    # Check access
+    if vehicle not in current_user.get_all_vehicles():
+        return jsonify({'success': False, 'error': 'Access denied'}), 403
+
+    # Check Tessie is configured for this vehicle
+    if not vehicle.tessie_vin:
+        return jsonify({'success': False, 'error': 'Vehicle not linked to Tessie'}), 400
+
+    if not TessieService.is_configured():
+        return jsonify({'success': False, 'error': 'Tessie integration not configured'}), 400
+
+    # Fetch charges from Tessie
+    success, result = TessieService.get_charges(vehicle.tessie_vin)
+
+    if not success:
+        return jsonify({'success': False, 'error': result}), 400
+
+    # Import charges that haven't been imported yet
+    imported_count = 0
+    skipped_count = 0
+
+    for charge in result:
+        tessie_id = str(charge.get('tessie_id'))
+
+        # Check if already imported
+        existing = ChargingSession.query.filter_by(tessie_charge_id=tessie_id).first()
+        if existing:
+            skipped_count += 1
+            continue
+
+        # Determine charger type
+        charger_type = 'tesla' if charge.get('is_supercharger') else 'level2'
+
+        # Create charging session
+        session = ChargingSession(
+            vehicle_id=vehicle.id,
+            user_id=current_user.id,
+            date=charge.get('date'),
+            start_time=charge.get('start_time'),
+            end_time=charge.get('end_time'),
+            odometer=charge.get('odometer_km'),  # Stored in km
+            kwh_added=charge.get('kwh_added'),
+            start_soc=charge.get('start_soc'),
+            end_soc=charge.get('end_soc'),
+            total_cost=charge.get('cost'),
+            charger_type=charger_type,
+            location=charge.get('location'),
+            tessie_charge_id=tessie_id
+        )
+        db.session.add(session)
+        imported_count += 1
+
+    db.session.commit()
+
+    return jsonify({
+        'success': True,
+        'imported': imported_count,
+        'skipped': skipped_count,
+        'message': f'Imported {imported_count} charging sessions ({skipped_count} already existed)'
+    })
 
 
 # =============================================================================
