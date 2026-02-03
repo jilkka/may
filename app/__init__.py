@@ -36,6 +36,49 @@ LANGUAGES = {
 }
 
 
+def _run_schema_migrations(app):
+    """Add missing columns to existing tables.
+
+    SQLite doesn't support adding columns via db.create_all() for existing tables,
+    so we manually add any missing columns here.
+    """
+    from sqlalchemy import text, inspect
+
+    # Define schema migrations: table -> [(column_name, column_type), ...]
+    migrations = {
+        'vehicles': [
+            ('tessie_vin', 'VARCHAR(20)'),
+            ('tessie_enabled', 'BOOLEAN DEFAULT 0'),
+            ('tessie_last_odometer', 'FLOAT'),
+            ('tessie_battery_level', 'INTEGER'),
+            ('tessie_battery_range', 'FLOAT'),
+            ('tessie_last_updated', 'DATETIME'),
+        ],
+    }
+
+    with db.engine.connect() as conn:
+        inspector = inspect(db.engine)
+
+        for table_name, columns in migrations.items():
+            # Check if table exists
+            if table_name not in inspector.get_table_names():
+                continue
+
+            # Get existing columns
+            existing_cols = [col['name'] for col in inspector.get_columns(table_name)]
+
+            # Add missing columns
+            for col_name, col_type in columns:
+                if col_name not in existing_cols:
+                    try:
+                        conn.execute(text(f'ALTER TABLE {table_name} ADD COLUMN {col_name} {col_type}'))
+                        app.logger.info(f'Added column {col_name} to {table_name}')
+                    except Exception as e:
+                        app.logger.warning(f'Could not add column {col_name} to {table_name}: {e}')
+
+        conn.commit()
+
+
 def get_locale():
     """Select the best language for the user"""
     # If user is logged in and has a language preference, use it
@@ -125,6 +168,8 @@ def create_app(config_class=Config):
 
     with app.app_context():
         db.create_all()
+        # Run schema migrations for new columns on existing tables
+        _run_schema_migrations(app)
         # Create default admin user if no users exist
         if User.query.count() == 0:
             admin_username = os.environ.get('ADMIN_USERNAME', 'admin')
