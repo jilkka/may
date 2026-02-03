@@ -4,6 +4,19 @@
 
 - Never include "Co-Authored-By: Claude" or similar AI attribution lines in commits
 
+## Development Workflow
+
+- **`main` branch**: Production - only receives changes via pull requests from `dev`
+- **`dev` branch**: Testing/development - all new features and changes go here first
+
+### Process
+
+1. All new features and changes are committed and pushed to the `dev` branch
+2. Test changes thoroughly on `dev`
+3. When ready for production, create a pull request from `dev` to `main`
+4. Include a comprehensive changelog in the PR description listing all changes
+5. After merge, the GitHub Actions workflow builds and pushes the production Docker image
+
 ---
 
 # Project Overview
@@ -65,17 +78,19 @@ SQLite database stored at `/data/may.db`. Flask-SQLAlchemy handles migrations vi
 
 The project uses GitHub Actions (`.github/workflows/docker-build.yml`) to automatically build and push Docker images:
 
-1. On push to `main` or new tags, the workflow triggers
+1. On push to `main`, `dev`, or new tags, the workflow triggers
 2. Builds a multi-platform Docker image (linux/amd64, linux/arm64)
 3. Pushes to GitHub Container Registry: `ghcr.io/dannymcc/may`
-4. Tags: `latest` for main branch, version tags (e.g., `v0.3.0`) for releases
+4. Tags: `latest` for main branch, `dev` for dev branch, version tags (e.g., `v0.3.0`) for releases
 
 ### Creating a Release
 
-1. Update `APP_VERSION` in `config.py`
-2. Commit and push changes
-3. Create a GitHub release with a version tag (e.g., `v0.3.0`)
-4. GitHub Actions builds and pushes the Docker image automatically
+1. Update `APP_VERSION` in `config.py` on the `dev` branch
+2. Commit and push changes to `dev`
+3. Create a pull request from `dev` to `main` with a comprehensive changelog
+4. Merge the PR to `main`
+5. Create a GitHub release with a version tag (e.g., `v0.3.0`)
+6. GitHub Actions builds and pushes the Docker image automatically
 
 ### Docker Deployment
 
