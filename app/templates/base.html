@@ -5,6 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ APP_NAME }}{% endblock %} - {{ APP_TAGLINE }}</title>
 
+    <script>
+        (function() {
+            const serverPref = {% if current_user.is_authenticated %}{{ 'true' if current_user.dark_mode else 'false' }}{% else %}null{% endif %};
+            const storedTheme = localStorage.getItem('may-theme');
+            let useDark = serverPref;
+
+            if (useDark === null) {
+                if (storedTheme) {
+                    useDark = storedTheme === 'dark';
+                } else if (window.matchMedia) {
+                    useDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                }
+            }
+
+            if (useDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+
+            if (serverPref !== null) {
+                localStorage.setItem('may-theme', serverPref ? 'dark' : 'light');
+            }
+        })();
+    </script>
+
     <!-- PWA Meta Tags -->
     <meta name="description" content="Track fuel consumption, expenses, and maintenance for your vehicles">
     <meta name="theme-color" content="{{ PRIMARY_COLOR }}">
@@ -16,10 +42,9 @@
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon.svg') }}">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Tailwind CSS - Critical for styling, loaded first -->
     <script>
+        window.tailwind = window.tailwind || {};
         // Generate color palette from primary color
         function hexToHSL(hex) {
             hex = hex.replace('#', '');
@@ -53,7 +78,7 @@
         }
         const baseColor = '{{ PRIMARY_COLOR }}';
         const [h, s, l] = hexToHSL(baseColor);
-        tailwind.config = {
+        window.tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
@@ -75,11 +100,27 @@
             }
         }
     </script>
+    <script>
+        window.__loadTailwindFallback = function() {
+            if (window.__tailwindFallbackLoaded) {
+                return;
+            }
+            window.__tailwindFallbackLoaded = true;
+            var fallbackScript = document.createElement('script');
+            fallbackScript.src = '{{ TAILWIND_CDN_URL }}';
+            document.head.appendChild(fallbackScript);
+        };
+    </script>
+    <script src="{{ TAILWIND_ASSET_URL }}" onerror="window.__loadTailwindFallback()"></script>
+    <!-- HTMX - Non-critical, deferred -->
+    <script src="{{ HTMX_CDN_URL }}" defer></script>
+    <!-- Chart.js - Only loaded on pages that need it via block -->
+    {% block extra_scripts %}{% endblock %}
     <style>
         [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="h-full bg-gray-50 dark:bg-gray-700 dark:bg-gray-900 transition-colors duration-200">
+<body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
     {% if current_user.is_authenticated %}
     <div class="min-h-full">
         <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
@@ -281,10 +322,13 @@
             .then(data => {
                 if (data.dark_mode) {
                     document.documentElement.classList.add('dark');
+                    localStorage.setItem('may-theme', 'dark');
                 } else {
                     document.documentElement.classList.remove('dark');
+                    localStorage.setItem('may-theme', 'light');
                 }
-            });
+            })
+            .catch(() => {});
     }
 
     // Close dropdown when clicking outside
@@ -309,24 +353,49 @@
         });
     }
 
-    // CSRF Protection: Automatically inject CSRF tokens into all POST forms
-    document.addEventListener('DOMContentLoaded', function() {
+    // CSRF Protection: Setup token injection immediately and also on DOMContentLoaded
+    // This handles both existing forms and dynamically added forms
+    (function() {
         const csrfToken = '{{ csrf_token() }}';
-        document.querySelectorAll('form[method="POST"], form[method="post"]').forEach(function(form) {
-            // Skip if token already exists
-            if (form.querySelector('input[name="csrf_token"]')) return;
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'csrf_token';
-            input.value = csrfToken;
-            form.insertBefore(input, form.firstChild);
-        });
+        const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+        
+        function injectCSRFTokens() {
+            document.querySelectorAll('form[method="POST"], form[method="post"]').forEach(function(form) {
+                // Skip if token already exists
+                if (form.querySelector('input[name="csrf_token"]')) return;
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'csrf_token';
+                input.value = csrfToken;
+                form.insertBefore(input, form.firstChild);
+            });
+        }
+
+        // Inject tokens immediately for forms rendered on initial load
+        injectCSRFTokens();
+        
+        // Also run on DOMContentLoaded for safety
+        document.addEventListener('DOMContentLoaded', injectCSRFTokens);
+        
+        // Watch for dynamically added forms (HTMX, etc.)
+        if (window.MutationObserver) {
+            new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.addedNodes.length) {
+                        injectCSRFTokens();
+                    }
+                });
+            }).observe(document.body, { 
+                childList: true, 
+                subtree: true 
+            });
+        }
 
         // Also handle HTMX requests
-        document.body.addEventListener('htmx:configRequest', function(event) {
+        document.addEventListener('htmx:configRequest', function(event) {
             event.detail.headers['X-CSRFToken'] = csrfToken;
         });
-    });
+    })();
     </script>
 </body>
 </html>
