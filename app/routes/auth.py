@@ -412,6 +412,45 @@ def delete_user(user_id):
     return redirect(url_for('auth.users'))
 
 
+@bp.route('/users/<int:user_id>/edit', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def edit_user(user_id):
+    """Edit a user's details (admin only)"""
+    user = User.query.get_or_404(user_id)
+
+    if request.method == 'POST':
+        new_email = request.form.get('email', '').strip()
+        if new_email and new_email != user.email:
+            existing = User.query.filter(User.email == new_email, User.id != user.id).first()
+            if existing:
+                flash('Email already in use by another account', 'error')
+                return render_template('auth/edit_user.html', user=user)
+            user.email = new_email
+
+        new_password = request.form.get('new_password', '').strip()
+        if new_password:
+            confirm_password = request.form.get('confirm_new_password', '')
+            if new_password != confirm_password:
+                flash('Passwords do not match', 'error')
+                return render_template('auth/edit_user.html', user=user)
+            is_valid, error_msg = validate_password_strength(new_password)
+            if not is_valid:
+                flash(error_msg, 'error')
+                return render_template('auth/edit_user.html', user=user)
+            user.set_password(new_password)
+
+        is_admin = request.form.get('is_admin') == 'on'
+        if user.id != current_user.id:
+            user.is_admin = is_admin
+
+        db.session.commit()
+        flash(f'User {user.username} updated successfully', 'success')
+        return redirect(url_for('auth.users'))
+
+    return render_template('auth/edit_user.html', user=user)
+
+
 @bp.route('/check-updates')
 @login_required
 def check_updates():
