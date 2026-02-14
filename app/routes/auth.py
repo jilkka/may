@@ -129,6 +129,16 @@ def settings():
         current_user.currency = currency[:10]
         current_user.date_format = request.form.get('date_format', 'DD/MM/YYYY')
 
+        # Update email if provided
+        new_email = request.form.get('email', '').strip()
+        if new_email and new_email != current_user.email:
+            existing = User.query.filter(User.email == new_email, User.id != current_user.id).first()
+            if existing:
+                flash('Email already in use by another account', 'error')
+                branding = AppSettings.get_all_branding() if current_user.is_admin else {}
+                return render_template('auth/settings.html', branding=branding)
+            current_user.email = new_email
+
         # Update password if provided
         new_password = request.form.get('new_password')
         if new_password:
@@ -310,6 +320,22 @@ def branding():
             AppSettings.set('logo_filename', filename)
 
     flash('Branding settings updated successfully', 'success')
+    return redirect(url_for('auth.settings') + '#branding')
+
+
+@bp.route('/branding/remove-logo', methods=['POST'])
+@login_required
+@admin_required
+def remove_logo():
+    """Remove the uploaded logo"""
+    logo_filename = AppSettings.get('logo_filename')
+    if logo_filename:
+        logo_path = os.path.join(current_app.config['UPLOAD_FOLDER'], logo_filename)
+        if os.path.exists(logo_path):
+            os.remove(logo_path)
+        AppSettings.set('logo_filename', '')
+
+    flash('Logo removed successfully', 'success')
     return redirect(url_for('auth.settings') + '#branding')
 
 
