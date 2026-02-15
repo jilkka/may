@@ -171,6 +171,9 @@ class Vehicle(db.Model):
     registration = db.Column(db.String(20))
     vin = db.Column(db.String(50))
 
+    # Tracking unit (mileage or hours)
+    tracking_unit = db.Column(db.String(20), default='mileage')  # mileage, hours
+
     # Fuel info
     fuel_type = db.Column(db.String(20), default='petrol')  # petrol, diesel, electric, hybrid, lpg
     tank_capacity = db.Column(db.Float)  # in liters
@@ -629,7 +632,16 @@ VEHICLE_TYPES = [
     ('scooter', 'Scooter'),
     ('truck', 'Truck'),
     ('suv', 'SUV'),
+    ('tractor', 'Tractor'),
+    ('atv_utv', 'ATV/UTV'),
+    ('boat', 'Boat'),
     ('other', 'Other')
+]
+
+# Tracking unit options
+TRACKING_UNITS = [
+    ('mileage', 'Mileage (km/mi)'),
+    ('hours', 'Hours'),
 ]
 
 # Fuel types

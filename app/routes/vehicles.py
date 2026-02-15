@@ -6,7 +6,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from app import db
-from app.models import Vehicle, VehicleSpec, VehiclePart, FuelLog, Expense, User, Reminder, VEHICLE_TYPES, FUEL_TYPES, VEHICLE_SPEC_TYPES, REMINDER_TYPES, PART_TYPES, AppSettings
+from app.models import Vehicle, VehicleSpec, VehiclePart, FuelLog, Expense, User, Reminder, VEHICLE_TYPES, FUEL_TYPES, VEHICLE_SPEC_TYPES, REMINDER_TYPES, PART_TYPES, TRACKING_UNITS, AppSettings
 from app.services.tessie import TessieService
 
 bp = Blueprint('vehicles', __name__, url_prefix='/vehicles')
@@ -45,6 +45,7 @@ def new():
             owner_id=current_user.id,
             name=request.form.get('name'),
             vehicle_type=request.form.get('vehicle_type'),
+            tracking_unit=request.form.get('tracking_unit', 'mileage'),
             make=request.form.get('make'),
             model=request.form.get('model'),
             year=int(request.form.get('year')) if request.form.get('year') else None,
@@ -92,6 +93,7 @@ def new():
                            vehicle=None,
                            vehicle_types=VEHICLE_TYPES,
                            fuel_types=FUEL_TYPES,
+                           tracking_units=TRACKING_UNITS,
                            spec_types=VEHICLE_SPEC_TYPES,
                            tessie_configured=tessie_configured)
 
@@ -164,6 +166,7 @@ def edit(vehicle_id):
     if request.method == 'POST':
         vehicle.name = request.form.get('name')
         vehicle.vehicle_type = request.form.get('vehicle_type')
+        vehicle.tracking_unit = request.form.get('tracking_unit', 'mileage')
         vehicle.make = request.form.get('make')
         vehicle.model = request.form.get('model')
         vehicle.year = int(request.form.get('year')) if request.form.get('year') else None
@@ -219,6 +222,7 @@ def edit(vehicle_id):
                            vehicle=vehicle,
                            vehicle_types=VEHICLE_TYPES,
                            fuel_types=FUEL_TYPES,
+                           tracking_units=TRACKING_UNITS,
                            spec_types=VEHICLE_SPEC_TYPES,
                            specs=specs,
                            tessie_configured=tessie_configured)
