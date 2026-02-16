@@ -2,9 +2,11 @@ import csv
 import hashlib
 import io
 import json
+import logging
 import os
 import sqlite3
 import tempfile
+import traceback
 import zipfile
 from functools import wraps
 from datetime import datetime
@@ -19,6 +21,8 @@ from app.models import (
 )
 from app.services.tessie import TessieService
 from config import APP_VERSION
+
+logger = logging.getLogger(__name__)
 
 bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -2026,6 +2030,57 @@ HAMMOND_FUEL_UNITS = {
 }
 
 # Hammond fuel type mapping
+# =============================================================================
+# Hammond / Clarkson Import Helpers
+# =============================================================================
+
+def _safe_get(row, key, default=None):
+    """Safely get a value from a sqlite3.Row, returning default if column missing."""
+    try:
+        val = row[key]
+        return val if val is not None else default
+    except (IndexError, KeyError):
+        return default
+
+
+def _safe_float(row, key, default=None):
+    """Safely get a float from a sqlite3.Row."""
+    val = _safe_get(row, key)
+    if val is None:
+        return default
+    try:
+        return float(val)
+    except (ValueError, TypeError):
+        logger.warning("Hammond: could not convert %s=%r to float", key, val)
+        return default
+
+
+def _safe_int(row, key, default=None):
+    """Safely get an int from a sqlite3.Row."""
+    val = _safe_get(row, key)
+    if val is None:
+        return default
+    try:
+        return int(val)
+    except (ValueError, TypeError):
+        logger.warning("Hammond: could not convert %s=%r to int", key, val)
+        return default
+
+
+def _parse_hammond_date(row, key):
+    """Parse a date from a Hammond row. Hammond stores dates as ISO 8601 strings.
+    Falls back to today's date if parsing fails."""
+    val = _safe_get(row, key)
+    if not val:
+        return datetime.utcnow().date()
+    try:
+        # Hammond may store dates as "2022-01-15T00:00:00Z" or "2022-01-15"
+        return datetime.fromisoformat(str(val).replace('Z', '+00:00')).date()
+    except (ValueError, TypeError) as e:
+        logger.warning("Hammond: could not parse date %s=%r: %s", key, val, e)
+        return datetime.utcnow().date()
+
+
 HAMMOND_FUEL_TYPES = {
     'PETROL': 'petrol',
     'DIESEL': 'diesel',
@@ -2067,8 +2122,19 @@ CLARKSON_FUEL_UNITS = {
 @login_required
 def import_hammond():
     """
-    Import data from Hammond SQLite database.
-    Expects a .db or .sqlite file upload.
+    Import data from a Hammond (github.com/akhilrex/hammond) SQLite database.
+
+    Hammond database schema (v2022.07.06):
+      vehicles: id, make, model, year_of_manufacture, nickname, registration,
+                vin, fuel_type (string: PETROL/DIESEL/etc), fuel_unit, distance_unit
+      fillups:  id, vehicle_id, fuel_quantity, per_unit_price, total_amount,
+                odo_reading, is_tank_full, has_missed_fillup, date (ISO string),
+                filling_station, comments, fuel_sub_type
+      expenses: id, vehicle_id, expense_type, amount, odo_reading, date (ISO string),
+                comments, type_id
+
+    Note: Hammond date fields may be ISO 8601 strings with or without timezone.
+    Some fields may be NULL depending on user input.
     """
     if 'file' not in request.files:
         flash('No file uploaded', 'error')
@@ -2084,133 +2150,190 @@ def import_hammond():
         file.save(tmp.name)
         tmp_path = tmp.name
 
+    logger.info("Hammond import started by user %s, file: %s", current_user.id, file.filename)
+
     try:
-        conn = sqlite3.connect(tmp_path)
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
+        # Validate the file is a valid SQLite database
+        try:
+            conn = sqlite3.connect(tmp_path)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            # Quick sanity check - this will fail if the file isn't a valid SQLite DB
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+            tables = {row['name'] for row in cursor.fetchall()}
+            logger.info("Hammond DB tables found: %s", tables)
+        except sqlite3.DatabaseError as e:
+            logger.error("Hammond import: uploaded file is not a valid SQLite database: %s", e)
+            flash('The uploaded file is not a valid SQLite database.', 'error')
+            return redirect(url_for('auth.settings') + '#integrations')
+
+        if not tables.intersection({'vehicles', 'fillups', 'expenses'}):
+            logger.warning("Hammond import: no recognised tables found. Tables in DB: %s", tables)
+            flash('This does not appear to be a Hammond database — no vehicles, fillups, or expenses tables found.', 'error')
+            conn.close()
+            return redirect(url_for('auth.settings') + '#integrations')
 
         # Track import statistics
         stats = {'vehicles': 0, 'fuel_logs': 0, 'expenses': 0}
+        skipped = {'vehicles': 0, 'fuel_logs': 0, 'expenses': 0}
         vehicle_id_map = {}  # Hammond vehicle ID -> May vehicle ID
 
-        # Import vehicles
-        try:
-            cursor.execute('SELECT * FROM vehicles')
-            hammond_vehicles = cursor.fetchall()
+        # --- Import vehicles ---
+        if 'vehicles' in tables:
+            try:
+                cursor.execute('SELECT * FROM vehicles')
+                hammond_vehicles = cursor.fetchall()
+                logger.info("Hammond: found %d vehicles to import", len(hammond_vehicles))
 
-            for hv in hammond_vehicles:
-                # Map fuel type
-                fuel_type = HAMMOND_FUEL_TYPES.get(hv['fuel_type'], 'petrol') if hv['fuel_type'] else 'petrol'
+                for hv in hammond_vehicles:
+                    try:
+                        # Safely read columns with defaults for missing/NULL values
+                        hv_id = hv['id']
+                        fuel_type_raw = _safe_get(hv, 'fuel_type')
+                        fuel_type = HAMMOND_FUEL_TYPES.get(fuel_type_raw, 'petrol') if fuel_type_raw else 'petrol'
+                        make = _safe_get(hv, 'make', '')
+                        model = _safe_get(hv, 'model', '')
+                        nickname = _safe_get(hv, 'nickname')
 
-                vehicle = Vehicle(
-                    owner_id=current_user.id,
-                    name=hv['nickname'] or f"{hv['make']} {hv['model']}".strip() or 'Imported Vehicle',
-                    vehicle_type='car',  # Hammond doesn't distinguish vehicle types
-                    make=hv['make'],
-                    model=hv['model'],
-                    year=hv['year_of_manufacture'],
-                    registration=hv['registration'],
-                    vin=hv['vin'],
-                    fuel_type=fuel_type,
-                    tank_capacity=None,
-                    notes=f"Imported from Hammond (ID: {hv['id']})"
-                )
-                db.session.add(vehicle)
-                db.session.flush()
-                vehicle_id_map[hv['id']] = vehicle.id
-                stats['vehicles'] += 1
+                        vehicle = Vehicle(
+                            owner_id=current_user.id,
+                            name=nickname or f"{make} {model}".strip() or 'Imported Vehicle',
+                            vehicle_type='car',  # Hammond doesn't distinguish vehicle types
+                            make=make or None,
+                            model=model or None,
+                            year=_safe_int(hv, 'year_of_manufacture'),
+                            registration=_safe_get(hv, 'registration'),
+                            vin=_safe_get(hv, 'vin'),
+                            fuel_type=fuel_type,
+                            tank_capacity=None,
+                            notes=f"Imported from Hammond (ID: {hv_id})"
+                        )
+                        db.session.add(vehicle)
+                        db.session.flush()
+                        vehicle_id_map[hv_id] = vehicle.id
+                        stats['vehicles'] += 1
+                    except (KeyError, IndexError) as e:
+                        logger.warning("Hammond: skipping vehicle row due to missing column: %s", e)
+                        skipped['vehicles'] += 1
+                    except Exception as e:
+                        logger.error("Hammond: error importing vehicle: %s\n%s", e, traceback.format_exc())
+                        skipped['vehicles'] += 1
 
-        except sqlite3.OperationalError:
-            pass  # Table doesn't exist
+            except sqlite3.OperationalError as e:
+                logger.warning("Hammond: could not read vehicles table: %s", e)
+        else:
+            logger.info("Hammond: no 'vehicles' table found, skipping")
 
-        # Import fillups (fuel logs)
-        try:
-            cursor.execute('SELECT * FROM fillups')
-            hammond_fillups = cursor.fetchall()
+        # --- Import fillups (fuel logs) ---
+        if 'fillups' in tables:
+            try:
+                cursor.execute('SELECT * FROM fillups')
+                hammond_fillups = cursor.fetchall()
+                logger.info("Hammond: found %d fillups to import", len(hammond_fillups))
 
-            for hf in hammond_fillups:
-                vehicle_id = vehicle_id_map.get(hf['vehicle_id'])
-                if not vehicle_id:
-                    continue
+                for hf in hammond_fillups:
+                    try:
+                        vehicle_id = vehicle_id_map.get(hf['vehicle_id'])
+                        if not vehicle_id:
+                            skipped['fuel_logs'] += 1
+                            continue
 
-                # Parse date
-                try:
-                    if hf['date']:
-                        # Hammond stores dates as ISO strings
-                        date = datetime.fromisoformat(hf['date'].replace('Z', '+00:00')).date()
-                    else:
-                        date = datetime.utcnow().date()
-                except (ValueError, TypeError):
-                    date = datetime.utcnow().date()
+                        date = _parse_hammond_date(hf, 'date')
 
-                log = FuelLog(
-                    vehicle_id=vehicle_id,
-                    user_id=current_user.id,
-                    date=date,
-                    odometer=float(hf['odo_reading']) if hf['odo_reading'] else 0,
-                    volume=float(hf['fuel_quantity']) if hf['fuel_quantity'] else None,
-                    price_per_unit=float(hf['per_unit_price']) if hf['per_unit_price'] else None,
-                    total_cost=float(hf['total_amount']) if hf['total_amount'] else None,
-                    is_full_tank=bool(hf['is_tank_full']) if hf['is_tank_full'] is not None else True,
-                    is_missed=bool(hf['has_missed_fillup']) if hf['has_missed_fillup'] is not None else False,
-                    station=hf['filling_station'],
-                    notes=hf['comments']
-                )
-                db.session.add(log)
-                stats['fuel_logs'] += 1
+                        log = FuelLog(
+                            vehicle_id=vehicle_id,
+                            user_id=current_user.id,
+                            date=date,
+                            odometer=_safe_float(hf, 'odo_reading', 0),
+                            volume=_safe_float(hf, 'fuel_quantity'),
+                            price_per_unit=_safe_float(hf, 'per_unit_price'),
+                            total_cost=_safe_float(hf, 'total_amount'),
+                            is_full_tank=bool(hf['is_tank_full']) if _safe_get(hf, 'is_tank_full') is not None else True,
+                            is_missed=bool(hf['has_missed_fillup']) if _safe_get(hf, 'has_missed_fillup') is not None else False,
+                            station=_safe_get(hf, 'filling_station'),
+                            notes=_safe_get(hf, 'comments')
+                        )
+                        db.session.add(log)
+                        stats['fuel_logs'] += 1
+                    except (KeyError, IndexError) as e:
+                        logger.warning("Hammond: skipping fillup row due to missing column: %s", e)
+                        skipped['fuel_logs'] += 1
+                    except Exception as e:
+                        logger.error("Hammond: error importing fillup: %s\n%s", e, traceback.format_exc())
+                        skipped['fuel_logs'] += 1
 
-        except sqlite3.OperationalError:
-            pass  # Table doesn't exist
+            except sqlite3.OperationalError as e:
+                logger.warning("Hammond: could not read fillups table: %s", e)
+        else:
+            logger.info("Hammond: no 'fillups' table found, skipping")
 
-        # Import expenses
-        try:
-            cursor.execute('SELECT * FROM expenses')
-            hammond_expenses = cursor.fetchall()
+        # --- Import expenses ---
+        if 'expenses' in tables:
+            try:
+                cursor.execute('SELECT * FROM expenses')
+                hammond_expenses = cursor.fetchall()
+                logger.info("Hammond: found %d expenses to import", len(hammond_expenses))
 
-            for he in hammond_expenses:
-                vehicle_id = vehicle_id_map.get(he['vehicle_id'])
-                if not vehicle_id:
-                    continue
+                for he in hammond_expenses:
+                    try:
+                        vehicle_id = vehicle_id_map.get(he['vehicle_id'])
+                        if not vehicle_id:
+                            skipped['expenses'] += 1
+                            continue
 
-                # Parse date
-                try:
-                    if he['date']:
-                        date = datetime.fromisoformat(he['date'].replace('Z', '+00:00')).date()
-                    else:
-                        date = datetime.utcnow().date()
-                except (ValueError, TypeError):
-                    date = datetime.utcnow().date()
+                        date = _parse_hammond_date(he, 'date')
 
-                # Map expense type
-                expense_type = (he['expense_type'] or 'other').lower()
-                valid_categories = [c[0] for c in EXPENSE_CATEGORIES]
-                if expense_type not in valid_categories:
-                    expense_type = 'other'
+                        # Map expense type
+                        expense_type_raw = _safe_get(he, 'expense_type', 'other')
+                        expense_type = (expense_type_raw or 'other').lower()
+                        valid_categories = [c[0] for c in EXPENSE_CATEGORIES]
+                        if expense_type not in valid_categories:
+                            expense_type = 'other'
 
-                expense = Expense(
-                    vehicle_id=vehicle_id,
-                    user_id=current_user.id,
-                    date=date,
-                    category=expense_type,
-                    description=he['expense_type'] or 'Imported expense',
-                    cost=float(he['amount']) if he['amount'] else 0,
-                    odometer=float(he['odo_reading']) if he['odo_reading'] else None,
-                    notes=he['comments']
-                )
-                db.session.add(expense)
-                stats['expenses'] += 1
+                        expense = Expense(
+                            vehicle_id=vehicle_id,
+                            user_id=current_user.id,
+                            date=date,
+                            category=expense_type,
+                            description=expense_type_raw or 'Imported expense',
+                            cost=_safe_float(he, 'amount', 0),
+                            odometer=_safe_float(he, 'odo_reading'),
+                            notes=_safe_get(he, 'comments')
+                        )
+                        db.session.add(expense)
+                        stats['expenses'] += 1
+                    except (KeyError, IndexError) as e:
+                        logger.warning("Hammond: skipping expense row due to missing column: %s", e)
+                        skipped['expenses'] += 1
+                    except Exception as e:
+                        logger.error("Hammond: error importing expense: %s\n%s", e, traceback.format_exc())
+                        skipped['expenses'] += 1
 
-        except sqlite3.OperationalError:
-            pass  # Table doesn't exist
+            except sqlite3.OperationalError as e:
+                logger.warning("Hammond: could not read expenses table: %s", e)
+        else:
+            logger.info("Hammond: no 'expenses' table found, skipping")
 
         db.session.commit()
         conn.close()
 
-        flash(f"Hammond import complete: {stats['vehicles']} vehicles, {stats['fuel_logs']} fuel logs, {stats['expenses']} expenses", 'success')
+        total_skipped = sum(skipped.values())
+        msg = (f"Hammond import complete: {stats['vehicles']} vehicles, "
+               f"{stats['fuel_logs']} fuel logs, {stats['expenses']} expenses imported.")
+        if total_skipped:
+            msg += f" ({total_skipped} records skipped due to errors — check server logs for details.)"
+        logger.info("Hammond import finished: imported=%s, skipped=%s", stats, skipped)
+        flash(msg, 'success')
+
+    except sqlite3.Error as e:
+        db.session.rollback()
+        logger.error("Hammond import failed (SQLite error): %s\n%s", e, traceback.format_exc())
+        flash(f'Import failed due to a database error. Check that the file is a valid Hammond database. Error: {e}', 'error')
 
     except Exception as e:
         db.session.rollback()
-        flash(f'Import failed: {str(e)}', 'error')
+        logger.error("Hammond import failed (unexpected error): %s\n%s", e, traceback.format_exc())
+        flash(f'Import failed: {e}', 'error')
 
     finally:
         # Clean up temp file
