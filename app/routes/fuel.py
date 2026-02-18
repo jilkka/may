@@ -136,8 +136,8 @@ def new():
     # Pre-select vehicle if provided
     selected_vehicle_id = request.args.get('vehicle_id', type=int)
 
-    # Get user's fuel stations for dropdown
-    stations = FuelStation.query.filter_by(user_id=current_user.id).order_by(
+    # Get all fuel stations for dropdown (stations are system-wide)
+    stations = FuelStation.query.order_by(
         FuelStation.is_favorite.desc(),
         FuelStation.times_used.desc()
     ).all()
@@ -195,8 +195,8 @@ def edit(log_id):
         flash(_('Fuel log updated successfully'), 'success')
         return redirect(url_for('vehicles.view', vehicle_id=log.vehicle_id))
 
-    # Get user's fuel stations for dropdown
-    stations = FuelStation.query.filter_by(user_id=current_user.id).order_by(
+    # Get all fuel stations for dropdown (stations are system-wide)
+    stations = FuelStation.query.order_by(
         FuelStation.is_favorite.desc(),
         FuelStation.times_used.desc()
     ).all()
@@ -245,8 +245,8 @@ def quick():
         flash(_('Please add a vehicle first'), 'info')
         return redirect(url_for('vehicles.new'))
 
-    # Get user's fuel stations for dropdown
-    stations = FuelStation.query.filter_by(user_id=current_user.id).order_by(
+    # Get all fuel stations for dropdown (stations are system-wide)
+    stations = FuelStation.query.order_by(
         FuelStation.is_favorite.desc(),
         FuelStation.times_used.desc()
     ).limit(10).all()
