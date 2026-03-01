@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from flask_babel import lazy_gettext as _l
 from app import db
+from sqlalchemy.orm import validates
 
 # Currency symbols for display in UI
 CURRENCY_SYMBOLS = {
@@ -505,6 +506,12 @@ class VehicleSpec(db.Model):
     label = db.Column(db.String(100), nullable=False)  # display label
     value = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    @validates('label')
+    def force_string(self, _, value):
+            if value is None:
+                return value
+            return str(value)
 
 
 class Reminder(db.Model):
